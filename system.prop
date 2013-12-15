@@ -1,0 +1,14 @@
+# RIL and telephony related settings
+rild.libargs=-d /dev/chnlat10
+rild.libpath=/system/lib/libmoto_ril.so
+persist.ril.mux.ttydevice=/dev/usb/tty2-1:1.2
+persist.ril.mux.noofchannels=8
+persist.ril.modem.mode=1
+persist.ril.modem.ttydevice=/dev/usb/tty2-1:1.4
+ro.telephony.default_network=4
+
+# Render UI with GPU
+debug.sf.hw=1
+
+# Screenshot fix
+ro.bq.gpu_to_cpu_unsupported=1
