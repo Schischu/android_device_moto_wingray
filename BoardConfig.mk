@@ -65,21 +65,22 @@ TARGET_NO_RADIOIMAGE := true
 
 # Audio
 BOARD_USES_GENERIC_AUDIO := false
+BOARD_OMX_NEEDS_LEGACY_AUDIO := true
 
 # Camera
 USE_CAMERA_STUB := false
 
 # Graphics
-BOARD_EGL_CFG := device/moto/wingray/egl.cfg
 USE_OPENGL_RENDERER := true
 TARGET_RUNNING_WITHOUT_SYNC_FRAMEWORK := true
+BOARD_EGL_WORKAROUND_BUG_10194508 := true
+SKIP_SET_METADATA := true
+BOARD_USE_MHEAP_SCREENSHOT := true
+BOARD_USES_HWCOMPOSER := true
+BOARD_EGL_NEEDS_LEGACY_FB := true
 
 # Enable WEBGL in WebKit
 ENABLE_WEBGL := true
-
-# HWComposer
-BOARD_USES_HWCOMPOSER := true
-BOARD_EGL_NEEDS_LEGACY_FB := true
 
 # Bluetooth
 BOARD_HAVE_BLUETOOTH := true
@@ -106,7 +107,7 @@ BOARD_HOSTAPD_PRIVATE_LIB := lib_driver_cmd_$(BOARD_WLAN_DEVICE)
 WIFI_DRIVER_FW_PATH_PARAM   := "/sys/module/bcmdhd/parameters/firmware_path"
 WIFI_DRIVER_FW_PATH_STA     := "/vendor/firmware/fw_bcmdhd.bin"
 WIFI_DRIVER_FW_PATH_AP      := "/vendor/firmware/fw_bcmdhd_apsta.bin"
-WIFI_DRIVER_FW_PATH_P2P     := "/vendor/firmware/fw_bcmdhd_p2p.bin"
+#WIFI_DRIVER_FW_PATH_MFG     := "/vendor/firmware/fw_bcmdhd_mfg.bin"
 
 
 # Vold
@@ -122,6 +123,14 @@ BOARD_UMS_LUNFILE := "/sys/devices/platform/fsl-tegra-udc/gadget/lun%d/file"
 BOARD_USES_MMCUTILS := true
 BOARD_HAS_NO_SELECT_BUTTON := true
 
+# Misc flags
+COMMON_GLOBAL_CFLAGS += -DNEEDS_VECTORIMPL_SYMBOLS
+
+# Avoid the generation of ldrcc instructions
+NEED_WORKAROUND_CORTEX_A9_745320 := true
+
+TARGET_ARCH_LOWMEM := true
+
 TARGET_RECOVERY_PIXEL_FORMAT := "RGB_565"
 TARGET_RECOVERY_UI_LIB := librecovery_ui_stingray
 
@@ -131,6 +140,9 @@ TARGET_RECOVERY_FSTAB = device/moto/wingray/fstab.stingray
 
 # BOARD_USES_EXTRA_THERMAL_SENSOR := false
 
+# Compatibility with pre-kitkat Sensor HALs
+SENSORS_NEED_SETRATE_ON_ENABLE := true
+
 # BOARD_LIB_DUMPSTATE := libdumpstate.wingray
 TARGET_RELEASETOOLS_EXTENSIONS := device/moto/wingray
 
@@ -139,7 +151,6 @@ TARGET_RELEASETOOLS_EXTENSIONS := device/moto/wingray
 DEVICE_RESOLUTION := 720x1280
 RECOVERY_SDCARD_ON_DATA := true
 RECOVERY_GRAPHICS_USE_LINELENGTH := true
-BOARD_HAS_NO_REAL_SDCARD := true
 PRODUCT_BUILD_PROP_OVERRIDES += BUILD_UTC_DATE=0
 #TARGET_RECOVERY_INITRC := device/moto/wingray/init.recovery.rc
 #TW_INCLUDE_CRYPTO := true

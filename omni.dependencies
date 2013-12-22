@@ -1,6 +1,2 @@
 [
-  {
-    "repository": "android_kernel_moto_stingray",
-    "target_path": "kernel/moto/stingray-kernel"
-  }
 ]

@@ -76,6 +76,8 @@ PRODUCT_COPY_FILES += \
 # These are the hardware-specific features
 PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/tablet_core_hardware.xml:system/etc/permissions/tablet_core_hardware.xml \
+    frameworks/native/data/etc/android.hardware.camera.xml:system/etc/permissions/android.hardware.camera.xml \
+    frameworks/native/data/etc/android.hardware.camera.autofocus.xml:system/etc/permissions/android.hardware.camera.autofocus.xml \
     frameworks/native/data/etc/android.hardware.camera.flash-autofocus.xml:system/etc/permissions/android.hardware.camera.flash-autofocus.xml \
     frameworks/native/data/etc/android.hardware.camera.front.xml:system/etc/permissions/android.hardware.camera.front.xml \
     frameworks/native/data/etc/android.hardware.location.gps.xml:system/etc/permissions/android.hardware.location.gps.xml \
@@ -88,29 +90,23 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.usb.accessory.xml:system/etc/permissions/android.hardware.usb.accessory.xml \
     frameworks/native/data/etc/android.hardware.usb.host.xml:system/etc/permissions/android.hardware.usb.host.xml \
 
-    
-# GPS configuration
-PRODUCT_COPY_FILES += \
-	device/moto/wingray/gps.conf:system/etc/gps.conf \
-	device/moto/wingray/gpsconfig.xml:system/etc/gpsconfig.xml
+PRODUCT_PROPERTY_OVERRIDES += \
+    ro.opengles.version=131072
 
 PRODUCT_PROPERTY_OVERRIDES += \
-	ro.opengles.version=131072
-
-PRODUCT_PROPERTY_OVERRIDES += \
-	ro.sf.lcd_density=160
+    ro.sf.lcd_density=160
 
 PRODUCT_CHARACTERISTICS := tablet
 
 PRODUCT_TAGS += dalvik.gc.type-precise
 
 PRODUCT_PACKAGES += \
-	librs_jni \
-	com.android.future.usb.accessory
+    librs_jni \
+    com.android.future.usb.accessory
 
 # Filesystem management tools
 PRODUCT_PACKAGES += \
-	e2fsck
+    e2fsck
 
 PRODUCT_PACKAGES += \
     audio_policy.stingray \
@@ -124,25 +120,33 @@ PRODUCT_PACKAGES += \
     bttest \
     whisperd
 
-
-
-
 # Bluetooth config file
-PRODUCT_COPY_FILES += \
-    system/bluetooth/data/main.nonsmartphone.conf:system/etc/bluetooth/main.conf \
+# PRODUCT_COPY_FILES += \
+#     system/bluetooth/data/main.nonsmartphone.conf:system/etc/bluetooth/main.conf \
 
-WIFI_BAND := 802_11_ABG
 
 PRODUCT_PACKAGES += \
     camera.stingray
 
 PRODUCT_PACKAGES += \
-	wpa_supplicant_overlay.conf \
-	p2p_supplicant_overlay.conf
+    wpa_supplicant_overlay.conf \
+    p2p_supplicant_overlay.conf
+
 PRODUCT_PROPERTY_OVERRIDES += \
-	wifi.interface=wlan0
+    wifi.interface=wlan0
+
+WIFI_BAND := 802_11_ABG
+
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
-	persist.sys.usb.config=mtp
+    persist.sys.usb.config=mtp
+
+PRODUCT_PROPERTY_OVERRIDES += \
+    ro.board.platform=tegra \
+    ro.carrier=wifi-only \
+    hwui.render_dirty_regions=false \
+    ro.zygote.disable_gl_preload=true \
+    ro.config.low_ram=true \
+    ro.bq.gpu_to_cpu_unsupported=true
 
 $(call inherit-product, frameworks/native/build/tablet-dalvik-heap.mk)
 $(call inherit-product-if-exists, vendor/moto/stingray/wingray-vendor.mk)

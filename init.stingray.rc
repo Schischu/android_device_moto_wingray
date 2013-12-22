@@ -56,6 +56,8 @@ on post-fs-data
     #Create location directory, BRCM guci library stores LTO file and read/write
     # config file.
     mkdir /data/location 0770 radio radio
+    mkdir /data/location/com.broadcom.gps 0770 radio radio
+    mkdir /data/location/com.broadcom.gps/logs 0770 radio radio
 
     # Set indication (checked by vold) that we have finished this action
     setprop vold.post_fs_data_done 1
@@ -175,7 +177,9 @@ service akmd2 /system/bin/akmd2
     group compass misc input
 
 service wpa_supplicant /system/bin/wpa_supplicant \
-    -iwlan0 -Dnl80211 -c/data/misc/wifi/wpa_supplicant.conf -e/data/misc/wifi/entropy.bin
+    -iwlan0 -Dnl80211 -c/data/misc/wifi/wpa_supplicant.conf \
+    -O/data/misc/wifi/sockets \
+    -e/data/misc/wifi/entropy.bin -g@android:wpa_wlan0
 #   we will start as root and wpa_supplicant will switch to user wifi
 #   after setting up the capabilities required for WEXT
 #   user wifi
