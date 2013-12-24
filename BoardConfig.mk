@@ -45,8 +45,9 @@ BOARD_KERNEL_BASE := 0x10000000
 BOARD_KERNEL_CMDLINE := androidboot.carrier=wifi-only product_type=w
 KERNEL_MODULES_DIR := /system/lib/modules
 TARGET_KERNEL_SOURCE := device/moto/stingray-kernel
-TARGET_KERNEL_CONFIG := stingray_defconfig
-TARGET_KERNEL_CUSTOM_TOOLCHAIN := arm-eabi-4.6
+TARGET_KERNEL_CONFIG := elementalx_defconfig
+# TARGET_KERNEL_CONFIG := stingray_defconfig
+# TARGET_KERNEL_CUSTOM_TOOLCHAIN := arm-eabi-4.6
 # TARGET_PREBUILT_KERNEL := device/moto/wingray/kernel
 
 # Filesystem
@@ -128,8 +129,6 @@ COMMON_GLOBAL_CFLAGS += -DNEEDS_VECTORIMPL_SYMBOLS
 
 # Avoid the generation of ldrcc instructions
 NEED_WORKAROUND_CORTEX_A9_745320 := true
-
-TARGET_ARCH_LOWMEM := true
 
 TARGET_RECOVERY_PIXEL_FORMAT := "RGB_565"
 TARGET_RECOVERY_UI_LIB := librecovery_ui_stingray

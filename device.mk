@@ -42,6 +42,7 @@ PRODUCT_PACKAGES += \
 
 PRODUCT_COPY_FILES := \
         device/moto/wingray/libaudio/audio_policy.conf:system/etc/audio_policy.conf
+
 PRODUCT_COPY_FILES += \
     device/moto/wingray/init.stingray.rc:root/init.stingray.rc \
     device/moto/wingray/init.stingray.usb.rc:root/init.stingray.usb.rc \
@@ -62,16 +63,12 @@ PRODUCT_COPY_FILES += \
     device/moto/wingray/mXT1386_10_AA.bin:system/etc/firmware/mXT1386_10_AA.bin \
     device/moto/wingray/mXT1386_10_FF.bin:system/etc/firmware/mXT1386_10_FF.bin
 
-
-
 PRODUCT_COPY_FILES += \
         device/moto/wingray/qtouch-touchscreen.idc:system/usr/idc/qtouch-touchscreen.idc \
         device/moto/wingray/cpcap-key.kl:system/usr/keylayout/cpcap-key.kl \
         device/moto/wingray/cpcap-key.kcm:system/usr/keychars/cpcap-key.kcm \
         device/moto/wingray/stingray-keypad.kl:system/usr/keylayout/stingray-keypad.kl \
         device/moto/wingray/stingray-keypad.kcm:system/usr/keychars/stingray-keypad.kcm
-
-
 
 # These are the hardware-specific features
 PRODUCT_COPY_FILES += \
@@ -143,9 +140,8 @@ PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.board.platform=tegra \
     ro.carrier=wifi-only \
-    hwui.render_dirty_regions=false \
+    debug.hwui.render_dirty_regions=false \
     ro.zygote.disable_gl_preload=true \
-    ro.config.low_ram=true \
     ro.bq.gpu_to_cpu_unsupported=true
 
 $(call inherit-product, frameworks/native/build/tablet-dalvik-heap.mk)
