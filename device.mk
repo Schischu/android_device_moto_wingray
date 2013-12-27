@@ -142,7 +142,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
     ro.carrier=wifi-only \
     debug.hwui.render_dirty_regions=false \
     ro.zygote.disable_gl_preload=true \
-    ro.bq.gpu_to_cpu_unsupported=true
+    ro.bq.gpu_to_cpu_unsupported=true \
+    ro.opengles.surface.rgb565=true
 
 $(call inherit-product, frameworks/native/build/tablet-dalvik-heap.mk)
 $(call inherit-product-if-exists, vendor/moto/stingray/wingray-vendor.mk)

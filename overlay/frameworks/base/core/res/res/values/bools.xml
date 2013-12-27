@@ -15,6 +15,5 @@
 -->
 
 <resources>
-    <bool name="has_dock_settings">true</bool>
-    <bool name="has_powercontrol_widget">false</bool>
+    <bool name="preferences_prefer_dual_pane">true</bool>
 </resources>

@@ -11,4 +11,7 @@
 /dev/block/platform/sdhci-tegra.3/by-name/misc          /misc               emmc      defaults                                              defaults
 /dev/block/platform/sdhci-tegra.3/by-name/boot          /boot               emmc      defaults                                              defaults
 /dev/block/platform/sdhci-tegra.3/by-name/recovery      /recovery           emmc      defaults                                              defaults
-/devices/platform/sdhci-tegra.2/mmc_host/mmc1           auto                auto      defaults                                              voldmanaged=storage/sdcard1:auto,noemulatedsd
+
+/devices/platform/sdhci-tegra.2/mmc_host/mmc1           auto                auto      defaults                                              voldmanaged=sdcard1:auto
+
+/devices/platform/tegra-ehci.2/usb1                     auto                auto      defaults                                              voldmanaged=usbdisk:auto
