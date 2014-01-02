@@ -49,6 +49,9 @@ PRODUCT_COPY_FILES += \
     device/moto/wingray/media_profiles.xml:system/etc/media_profiles.xml \
     device/moto/wingray/media_codecs.xml:system/etc/media_codecs.xml
 
+PRODUCT_COPY_FILES += \
+    device/moto/wingray/twrp.fstab:recovery/root/etc/twrp.fstab
+
 # ifneq ($(TARGET_PREBUILT_WIFI_MODULE),)
 # PRODUCT_COPY_FILES += \
 #     $(TARGET_PREBUILT_WIFI_MODULE):system/lib/modules/bcm4329.ko
