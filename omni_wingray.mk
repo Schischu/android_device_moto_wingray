@@ -37,4 +37,4 @@ TARGET_KERNEL_CONFIG := stingray_defconfig
 TARGET_VARIANT_CONFIG := stingray_defconfig
 # TARGET_SELINUX_CONFIG := stingray_defconfig
 
-$(call inherit-product-if-exists, vendor/moto/stingray/wingray-vendor.mk)
+$(call inherit-product-if-exists, vendor/moto/wingray/wingray-vendor.mk)

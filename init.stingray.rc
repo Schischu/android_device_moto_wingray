@@ -79,6 +79,10 @@ on post-fs-data
     setprop vold.post_fs_data_done 1
 
 on boot
+# cmdline
+    #chown system system /proc/cmdline
+    chmod 0666 /proc/cmdline
+
 # bluetooth
     # power up/down interface
     chown bluetooth net_bt_stack /sys/class/rfkill/rfkill0/type

@@ -13,6 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-$(call inherit-product, device/lge/mako/full_wingray.mk)
+$(call inherit-product, device/moto/wingray/full_wingray.mk)
 
 PRODUCT_NAME := aosp_wingray

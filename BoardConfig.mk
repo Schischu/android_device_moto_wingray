@@ -14,9 +14,6 @@
 #
 USE_PROPRIETARY_AUDIO_EXTENSIONS := false
 
-# Use a smaller subset of system fonts to keep image size lower
-SMALLER_FONT_FOOTPRINT := true
-
 TARGET_CPU_ABI := armeabi-v7a
 TARGET_CPU_ABI2 := armeabi
 TARGET_CPU_SMP := true
@@ -39,7 +36,7 @@ TARGET_TEGRA_VERSION := ap20
 TARGET_BOARD_PLATFORM_GPU := tegra
 TARGET_USERIMAGES_USE_EXT4 := true
 
-
+# Kernel
 BOARD_KERNEL_PAGESIZE := 2048
 BOARD_KERNEL_BASE := 0x10000000
 BOARD_KERNEL_CMDLINE := androidboot.carrier=wifi-only product_type=w

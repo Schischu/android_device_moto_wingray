@@ -14,4 +14,4 @@
 
 /devices/platform/sdhci-tegra.2/mmc_host/mmc1           auto                auto      defaults                                              voldmanaged=sdcard1:auto
 
-/devices/platform/tegra-ehci.2/usb1                     auto                auto      defaults                                              voldmanaged=usbdisk:auto
+/devices/platform/tegra-ehci                            auto                auto      defaults                                              voldmanaged=usbdisk:auto
