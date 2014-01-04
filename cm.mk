@@ -14,27 +14,19 @@
 # limitations under the License.
 #
 
-# Sample: This is where we'd set a backup provider if we had one
-# $(call inherit-product, device/sample/products/backup_overlay.mk)
-
 # Inherit from the common Open Source product configuration
 $(call inherit-product, $(SRC_TARGET_DIR)/product/aosp_base_telephony.mk)
 
 # Inherit from our custom product configuration
-$(call inherit-product, vendor/omni/config/common.mk)
+$(call inherit-product, vendor/cm/config/common_full_phone.mk)
 
 # Inherit from hardware-specific part of the product configuration
 $(call inherit-product, device/moto/wingray/device.mk)
 
-PRODUCT_NAME := omni_wingray
+PRODUCT_NAME := cm_wingray
 PRODUCT_DEVICE := wingray
 PRODUCT_BRAND := motorola
 PRODUCT_MODEL := Xoom Wifi
 PRODUCT_MANUFACTURER := MOTOROLA
-
-# Kernel inline build
-TARGET_KERNEL_CONFIG := stingray_defconfig
-TARGET_VARIANT_CONFIG := stingray_defconfig
-# TARGET_SELINUX_CONFIG := stingray_defconfig
 
 $(call inherit-product-if-exists, vendor/moto/wingray/wingray-vendor.mk)
