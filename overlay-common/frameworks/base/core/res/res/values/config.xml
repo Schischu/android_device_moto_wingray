@@ -210,5 +210,5 @@
     <bool name="config_showNavigationBar">true</bool>
 
     <!--  Maximum number of supported users -->
-    <integer name="config_multiuserMaximumUsers">2</integer>
+    <integer name="config_multiuserMaximumUsers">5</integer>
 </resources>
