@@ -42,7 +42,7 @@ BOARD_KERNEL_BASE := 0x10000000
 BOARD_KERNEL_CMDLINE := androidboot.carrier=wifi-only product_type=w
 KERNEL_MODULES_DIR := /system/lib/modules
 TARGET_KERNEL_SOURCE := device/moto/stingray-kernel
-TARGET_KERNEL_CONFIG := elementalx_defconfig
+TARGET_KERNEL_CONFIG := elementalxvanilla_defconfig
 # TARGET_KERNEL_CONFIG := stingray_defconfig
 # TARGET_KERNEL_CUSTOM_TOOLCHAIN := arm-eabi-4.6
 # TARGET_PREBUILT_KERNEL := device/moto/wingray/kernel
