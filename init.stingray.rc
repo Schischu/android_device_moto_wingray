@@ -129,7 +129,7 @@ on boot
     chmod 666 /dev/nvhost-vi
     
 # Disable charging LED
-   write /sys/class/gpio/gpio168/value 1
+#   write /sys/class/gpio/gpio168/value 1
 
 # Camera
     chown media camera /sys/class/leds/privacy-led/brightness
