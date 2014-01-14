@@ -38,6 +38,7 @@ on init
 on fs
     mount_all /fstab.stingray
     setprop ro.crypto.fuse_sdcard true
+    symlink /dev/block/platform/sdhci-tegra.3/by-name/logo.bin /dev/block/platform/sdhci-tegra.3/by-name/logo
 
 on post-fs-data
     # we will remap this as /mnt/sdcard with the sdcard fuse tool
