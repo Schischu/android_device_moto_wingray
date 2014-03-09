@@ -140,6 +140,9 @@ PRODUCT_PACKAGES += \
     wpa_supplicant_overlay.conf \
     p2p_supplicant_overlay.conf
 
+PRODUCT_PACKAGES += \
+    Torch
+
 PRODUCT_PROPERTY_OVERRIDES += \
     wifi.interface=wlan0
 
