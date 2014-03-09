@@ -128,6 +128,9 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     libemoji
 
+PRODUCT_PACKAGES += \
+    OmniTorch
+
 # Bluetooth config file
 # PRODUCT_COPY_FILES += \
 #     system/bluetooth/data/main.nonsmartphone.conf:system/etc/bluetooth/main.conf \
