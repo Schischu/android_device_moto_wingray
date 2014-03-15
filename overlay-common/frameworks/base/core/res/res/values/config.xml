@@ -20,15 +20,43 @@
 <!-- These resources are around just to allow their values to be customized
      for different hardware and product builds. -->
 <resources>
+    <!-- Flag indicating whether the surface flinger has limited
+         alpha compositing functionality in hardware.  If set, the window
+         manager will disable alpha trasformation in animations where not
+         strictly needed. -->
     <bool name="config_sf_limitedAlpha">false</bool>
+
+    <!-- Flag indicating whether the surface flinger is inefficient
+         at performing a blur.  Used by parts of the UI to turn off
+         the blur effect where it isn't worth the performance hit.
+         As of Honeycomb, blurring is not supported anymore. -->
     <bool name="config_sf_slowBlur">false</bool>
+
+    <integer name="config_shortAnimTime">200</integer>
     <integer name="config_shortAnimTime">0</integer>
+
+    <!-- The duration (in milliseconds) of a medium-length animation. -->
     <integer name="config_mediumAnimTime">0</integer>
+
+    <!-- The duration (in milliseconds) of a long animation. -->
     <integer name="config_longAnimTime">0</integer>
+
+    <!-- Duration for the dim animation behind a dialog.  This may be either
+         a percentage, which is relative to the duration of the enter/open
+         animation of the window being shown that is dimming behind, or it may
+         be an integer for a constant duration. -->
     <fraction name="config_dimBehindFadeDuration">0%</fraction>
+
+    <!-- Enables or disables fading edges when marquee is enabled in TextView. -->
     <bool name="config_ui_enableFadingMarquee">false</bool>
-    <bool name="config_avoidGfxAccel">true</bool>
-    
+
+    <!-- Device configuration indicating whether we should avoid using accelerated graphics
+     in certain places to reduce RAM footprint.  This is ignored if ro.config.low_ram
+     is true (in that case this is assumed true as well).  It can allow you to tune down
+     your device's memory use without going to the point of causing applications to turn
+     off features. -->
+    <bool name="config_avoidGfxAccel">false</bool>
+
     <!-- XXXXX NOTE THE FOLLOWING RESOURCES USE THE WRONG NAMING CONVENTION.
          Please don't copy them, copy anything else. -->
 
