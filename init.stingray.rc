@@ -139,7 +139,7 @@ on boot
     chown media camera /sys/class/leds/torch/brightness
     chmod 660 /sys/class/leds/privacy-led/brightness
     chmod 660 /sys/class/leds/flash/brightness
-    chmod 660 /sys/class/leds/torch/brightness
+    chmod 666 /sys/class/leds/torch/brightness
 
 # UART Device
     chown radio radio /dev/ttyHS4
