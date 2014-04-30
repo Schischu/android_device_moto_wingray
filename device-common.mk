@@ -109,8 +109,8 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     audio_policy.stingray \
     audio.primary.stingray \
-    audio.a2dp.default \
-    audio.usb.default \
+    audio.usb.stingray \
+    audio.a2dp.default
 
 PRODUCT_PACKAGES += \
     tctl \
