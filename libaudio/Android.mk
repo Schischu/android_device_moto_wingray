@@ -2,14 +2,20 @@ ifneq ($(BUILD_TINY_ANDROID),true)
 
 LOCAL_PATH := $(call my-dir)
 
+####################################
+
 include $(CLEAR_VARS)
 
-LOCAL_SRC_FILES := \
-    AudioPolicyManager.cpp
+LOCAL_MODULE := audio_policy.stingray
+LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
+LOCAL_MODULE_TAGS := optional
 
 LOCAL_SHARED_LIBRARIES := \
     libcutils \
     libutils
+
+LOCAL_SRC_FILES := \
+    AudioPolicyManager.cpp
 
 LOCAL_STATIC_LIBRARIES := \
     libmedia_helper
@@ -17,12 +23,9 @@ LOCAL_STATIC_LIBRARIES := \
 LOCAL_WHOLE_STATIC_LIBRARIES := \
     libaudiopolicy_legacy
 
-LOCAL_MODULE := audio_policy.stingray
-LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
-LOCAL_MODULE_TAGS := optional
-
 include $(BUILD_SHARED_LIBRARY)
 
+####################################
 
 include $(CLEAR_VARS)
 
@@ -66,6 +69,31 @@ LOCAL_STATIC_LIBRARIES += \
 LOCAL_CFLAGS += -DUSE_PROPRIETARY_AUDIO_EXTENSIONS
 LOCAL_C_INCLUDES += vendor/moto/stingray/motomm/ghdr
 LOCAL_C_INCLUDES += vendor/moto/stingray/motomm/rate_conv
+endif
+
+include $(BUILD_SHARED_LIBRARY)
+
+####################################
+
+include $(CLEAR_VARS)
+
+LOCAL_MODULE := audio.usb.stingray
+LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
+LOCAL_MODULE_TAGS := optional
+
+LOCAL_SHARED_LIBRARIES := \
+    liblog \
+    libcutils \
+    libtinyalsa
+
+LOCAL_SRC_FILES += \
+    AudioHardwareUSB.c
+
+LOCAL_C_INCLUDES += \
+    external/tinyalsa/include
+
+ifneq ($(BOARD_USB_AUDIO_CARD_ID),)
+LOCAL_CFLAGS += -DCARD_ID=$(BOARD_USB_AUDIO_CARD_ID)
 endif
 
 include $(BUILD_SHARED_LIBRARY)

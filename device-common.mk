@@ -109,8 +109,8 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     audio_policy.stingray \
     audio.primary.stingray \
-    audio.a2dp.default \
-    audio.usb.default \
+    audio.usb.stingray \
+    audio.a2dp.default
 
 PRODUCT_PACKAGES += \
     tctl \
@@ -128,9 +128,6 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     libemoji
 
-PRODUCT_PACKAGES += \
-    OmniTorch
-
 # Bluetooth config file
 # PRODUCT_COPY_FILES += \
 #     system/bluetooth/data/main.nonsmartphone.conf:system/etc/bluetooth/main.conf \
@@ -142,6 +139,9 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     wpa_supplicant_overlay.conf \
     p2p_supplicant_overlay.conf
+
+PRODUCT_PACKAGES += \
+    OmniTorch
 
 PRODUCT_PROPERTY_OVERRIDES += \
     wifi.interface=wlan0
