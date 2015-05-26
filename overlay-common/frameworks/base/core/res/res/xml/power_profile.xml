@@ -18,68 +18,73 @@
 -->
 <device name="Android">
   <!-- All values are in mA except as noted -->
-  <item name="none">0</item>
-  <item name="screen.on">256</item>
-  <item name="screen.full">318</item>
-  <item name="bluetooth.active">14.0</item>
+    <item name="none">0</item>
+    <item name="screen.on">256</item>
+    <item name="screen.full">318</item>
+    <item name="bluetooth.active">14.0</item>
+
       <!--
       Bluetooth stereo audio playback                          14.0 mA
       -->
-  <item name="bluetooth.on">1.4</item>
+    <item name="bluetooth.on">1.4</item>
+
       <!--
       I measured the following value                            1.4 mA
       but there is a GPIO fix pending that should
       bring this down to                                        0.2 mA
       -->
-  <item name="wifi.on">2.9</item>
-  <item name="wifi.active">31.0</item>
-  <item name="wifi.scan">6.5</item>
-  <item name="dsp.audio">14.1</item>
-  <item name="dsp.video">54.0</item>
-  <item name="gps.on">29.7</item>
-  <item name="radio.active">71.5</item>
-  <item name="radio.scanning">1.2</item>
-  <array name="radio.on"> <!-- Strength 0 to BINS-1 (4) -->
-      <value>1.2</value>
-  </array>
+    <item name="wifi.on">2.9</item>
+    <item name="wifi.active">31.0</item>
+    <item name="wifi.scan">6.5</item>
+    <item name="dsp.audio">14.1</item>
+    <item name="dsp.video">54.0</item>
+    <item name="gps.on">29.7</item>
+    <item name="radio.active">71.5</item>
+    <item name="radio.scanning">1.2</item>
+    <array name="radio.on"> <!-- Strength 0 to BINS-1 (4) -->
+        <value>1.2</value>
+    </array>
+
       <!-- Different CPU speeds as reported in
        /sys/devices/system/cpu/cpu0/cpufreq/stats/time_in_state -->
-  <array name="cpu.speeds">
-      <value>216000</value>  <!-- 216 MHz -->
-      <value>312000</value>  <!-- 312 MHz -->
-      <value>456000</value>  <!-- 456 MHz -->
-      <value>608000</value>  <!-- 608 MHz -->
-      <value>760000</value>  <!-- 760 MHz -->
-      <value>816000</value>  <!-- 816 MHz -->
-      <value>912000</value>  <!-- 912 MHz -->
-      <value>1000000</value> <!--   1 GHz -->
-      <value>1200000</value> <!-- 1.2 GHz -->
-      <value>1400000</value> <!-- 1.4 GHz -->
-      <value>1504000</value> <!-- 1.504 GHz -->
-      <value>1600000</value> <!-- 1.6 GHz -->
-      <value>1700000</value> <!-- 1.7 GHz -->
-  </array>
-  <!-- Power consumption when CPU is idle -->
-  <item name="cpu.idle">3.8</item>
-  <item name="cpu.awake">54.6</item>
-  <!-- Power consumption at different speeds -->
-  <array name="cpu.active">
-      <value>100</value> <!-- 216 MHz -->
-      <value>107</value> <!-- 312 MHz -->
-      <value>116</value> <!-- 456 MHz -->
-      <value>123</value> <!-- 608 MHz -->
-      <value>135</value> <!-- 760 MHz -->
-      <value>138</value> <!-- 816 MHz -->
-      <value>142</value> <!-- 912 MHz -->
-      <value>148</value> <!--   1 GHz -->
-      <value>154</value> <!-- 1.2 GHz -->
-      <value>161</value> <!-- 1.4 GHz -->
-      <value>165</value> <!-- 1.504 GHz -->
-      <value>171</value> <!-- 1.6 GHz -->
-      <value>176</value> <!-- 1.7 GHz -->
-  </array>
-  <!-- This is the battery capacity in mAh -->
-  <item name="battery.capacity">3260</item>
+    <array name="cpu.speeds">
+        <value>216000</value>  <!-- 216 MHz -->
+        <value>312000</value>  <!-- 312 MHz -->
+        <value>456000</value>  <!-- 456 MHz -->
+        <value>608000</value>  <!-- 608 MHz -->
+        <value>760000</value>  <!-- 760 MHz -->
+        <value>816000</value>  <!-- 816 MHz -->
+        <value>912000</value>  <!-- 912 MHz -->
+        <value>1000000</value> <!--   1 GHz -->
+        <value>1200000</value> <!-- 1.2 GHz -->
+        <value>1400000</value> <!-- 1.4 GHz -->
+        <value>1504000</value> <!-- 1.504 GHz -->
+        <value>1600000</value> <!-- 1.6 GHz -->
+        <value>1700000</value> <!-- 1.7 GHz -->
+    </array>
+
+    <!-- Power consumption when CPU is idle -->
+    <item name="cpu.idle">3.8</item>
+    <item name="cpu.awake">54.6</item>
+    <!-- Power consumption at different speeds -->
+    <array name="cpu.active">
+        <value>100</value> <!-- 216 MHz -->
+        <value>107</value> <!-- 312 MHz -->
+        <value>116</value> <!-- 456 MHz -->
+        <value>123</value> <!-- 608 MHz -->
+        <value>135</value> <!-- 760 MHz -->
+        <value>138</value> <!-- 816 MHz -->
+        <value>142</value> <!-- 912 MHz -->
+        <value>148</value> <!--   1 GHz -->
+        <value>154</value> <!-- 1.2 GHz -->
+        <value>161</value> <!-- 1.4 GHz -->
+        <value>165</value> <!-- 1.504 GHz -->
+        <value>171</value> <!-- 1.6 GHz -->
+        <value>176</value> <!-- 1.7 GHz -->
+    </array>
+
+    <!-- This is the battery capacity in mAh -->
+    <item name="battery.capacity">3260</item>
       <!--
       Battery capacity is 3260 mAH (at 7.4 Volts)
       -->

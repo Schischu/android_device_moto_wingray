@@ -26,30 +26,34 @@
  */
 
 static const struct sensor_t sSensorList[] = {
+#if 1
         { "KXTF9 3-axis Accelerometer",
                 "Kionix",
                 1, SENSORS_HANDLE_BASE+ID_A,
-                SENSOR_TYPE_ACCELEROMETER, MAX_RANGE_A, CONVERT_A, 0.57f, 20000, 0, 0, { } },
+                SENSOR_TYPE_ACCELEROMETER, MAX_RANGE_A, CONVERT_A, 0.57f, 20000, 0, 0, 0, 0, 0, 0, { } },
+#endif
 	{ "Ambient Light sensor",
                 "Maxim",
                 1, SENSORS_HANDLE_BASE+ID_L,
-                SENSOR_TYPE_LIGHT, 208076.8f, 0.05f, 0.003f, 0,  0, 0, { } },
+                SENSOR_TYPE_LIGHT, 208076.8f, 0.05f, 0.003f, 0,  0, 0, 0, 0, 0, 0, { } },
 	{ "AK8975 3-axis Magnetic field sensor",
                 "Asahi Kasei",
                 1, SENSORS_HANDLE_BASE+ID_M,
-                SENSOR_TYPE_MAGNETIC_FIELD, 2000.0f, CONVERT_M, 6.8f, 30000, 0, 0, { } },
+                SENSOR_TYPE_MAGNETIC_FIELD, 2000.0f, CONVERT_M, 6.8f, 30000, 0, 0, 0, 0, 0, 0, { } },
 	{ "AK8975 Orientation sensor",
                 "Asahi Kasei",
                 1, SENSORS_HANDLE_BASE+ID_O,
-                SENSOR_TYPE_ORIENTATION, 360.0f, CONVERT_O, 7.05f, 30000, 0, 0, { } },
+                SENSOR_TYPE_ORIENTATION, 360.0f, CONVERT_O, 7.05f, 30000, 0, 0, 0, 0, 0, 0, { } },
+#if 0
 	{ "BMP085 Pressure sensor",
                 "Bosch",
                 1, SENSORS_HANDLE_BASE+ID_B,
                 SENSOR_TYPE_PRESSURE, 110000.0f, 1.0f, 1.0f, 30000, 0, 0, { } },
+#endif
 	{ "L3G4200D Gyroscope sensor",
                 "ST Micro",
                 1, SENSORS_HANDLE_BASE+ID_G,
-                SENSOR_TYPE_GYROSCOPE, MAX_RANGE_G, CONVERT_G, 6.1f, 1250, 0, 0, { } },
+                SENSOR_TYPE_GYROSCOPE, MAX_RANGE_G, CONVERT_G, 6.1f, 1250, 0, 0, 0, 0, 0, 0, { } },
 };
 
 static int open_sensors(const struct hw_module_t* module, const char* name,

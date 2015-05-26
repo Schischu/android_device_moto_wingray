@@ -1,0 +1,8 @@
+/efs                    ext4            /dev/block/mmcblk0p1   flags=display="EFS";backup=1
+/boot                   emmc            /dev/block/mmcblk0p3
+/recovery               emmc            /dev/block/mmcblk0p2
+/modem					emmc			/dev/block/mmcblk0p7	flags=display="Modem";backup=1
+/cache                  ext4            /dev/block/mmcblk0p5
+/system                 ext4            /dev/block/mmcblk0p4
+/data                   ext4            /dev/block/mmcblk0p8
+/extra                  ext4            /dev/block/mmcblk0p10

@@ -62,11 +62,14 @@ AkmSensor::AkmSensor()
 
     open_device();
 
+#if 0
     if (!ioctl(dev_fd, ECS_IOCTL_APP_GET_AFLAG, &flags)) {
         if (flags)  {
             mEnabled |= 1<<Accelerometer;
         }
     }
+#endif
+
     if (!ioctl(dev_fd, ECS_IOCTL_APP_GET_MVFLAG, &flags)) {
         if (flags)  {
             mEnabled |= 1<<MagneticField;
@@ -106,7 +109,9 @@ int AkmSensor::enable(int32_t handle, int en)
         }
         int cmd;
         switch (what) {
+#if 0
             case Accelerometer: cmd = ECS_IOCTL_APP_SET_AFLAG;  break;
+#endif
             case MagneticField: cmd = ECS_IOCTL_APP_SET_MVFLAG; break;
             case Orientation:   cmd = ECS_IOCTL_APP_SET_MFLAG;  break;
         }

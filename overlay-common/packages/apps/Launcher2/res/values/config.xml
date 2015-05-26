@@ -1,5 +1,4 @@
 <resources>
     <bool name="config_largeHeap">true</bool>
-    <bool name="is_large_screen">true</bool>
-    <bool name="allow_rotation">true</bool>
+<!--    <bool name="config_render_wallpaper_internally">true</bool>-->
 </resources>

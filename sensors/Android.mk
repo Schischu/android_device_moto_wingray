@@ -30,7 +30,6 @@ LOCAL_SRC_FILES := 						\
 				AccelerationSensor.cpp		\
 				LightSensor.cpp			\
 				AkmSensor.cpp			\
-				PressureSensor.cpp		\
 				GyroSensor.cpp
 
 

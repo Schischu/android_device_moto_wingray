@@ -1,5 +1,8 @@
-# Render UI with GPU
-debug.sf.hw=1
+#
+# system.prop for wingray
+#
+ro.opengles.version = 131072
+keyguard.no_require_sim=yes
 
-# Screenshot fix
-ro.bq.gpu_to_cpu_unsupported=1
+#screenshot flag
+ro.bq.gpu_to_cpu_unsupported = 1

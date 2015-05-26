@@ -117,6 +117,18 @@ public:
                                 uint32_t *sampleRate=0,
                                 status_t *status=0);
 
+    //New in 5.x
+#if 1
+    //AudioHardwareInterface.cpp defines a default implementation
+    virtual AudioStreamOut* openOutputStreamWithFlags(
+                                uint32_t devices,
+                                audio_output_flags_t flags=(audio_output_flags_t)0,
+                                int *format=0,
+                                uint32_t *channels=0,
+                                uint32_t *sampleRate=0,
+                                status_t *status=0);
+#endif
+
     virtual AudioStreamIn* openInputStream(
 
                                 uint32_t devices,
@@ -130,8 +142,26 @@ public:
     virtual    void        closeInputStream(AudioStreamIn* in);
 
     virtual    size_t      getInputBufferSize(uint32_t sampleRate, int format, int channelCount);
+
     // AudioHardwareBase provides default implementation
     //virtual  status_t    dumpState(int fd, const Vector<String16>& args);
+
+    //New in 5.x
+    virtual status_t setMasterMute(bool muted);
+
+#if 1
+    virtual int createAudioPatch(unsigned int num_sources,
+                               const struct audio_port_config *sources,
+                               unsigned int num_sinks,
+                               const struct audio_port_config *sinks,
+                               audio_patch_handle_t *handle);
+
+    virtual int releaseAudioPatch(audio_patch_handle_t handle);
+
+    virtual int getAudioPort(struct audio_port *port);
+
+    virtual int setAudioPortConfig(const struct audio_port_config *config);
+#endif
 
     // added by AudioHardware
                status_t    init();
@@ -227,6 +257,13 @@ private:
         virtual String8     getParameters(const String8& keys);
                 uint32_t    devices() { return mDevices; }
         virtual status_t    getRenderPosition(uint32_t *dspFrames);
+        
+        //New in 5.x
+        virtual status_t    getPresentationPosition(uint64_t *frames, struct timespec *timestamp);
+        
+        //New in 5.x
+        virtual status_t    getNextWriteTimestamp(int64_t *timestamp);
+        
                 void        lock() { mSleepReq = true; mLock.lock();  mSleepReq = false; }
                 void        unlock() { mLock.unlock(); }
                 bool        isLocked() { return mLocked; }

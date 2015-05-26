@@ -21,4 +21,13 @@
     <integer name="def_screen_off_timeout">120000</integer>
     <!-- Set the automatic brightness mode on by default -->
     <bool name="def_screen_brightness_automatic_mode">true</bool>
+
+    <bool name="def_accelerometer_rotation">false</bool>
+
+    <fraction name="def_window_animation_scale">50.0%</fraction>
+    <fraction name="def_window_transition_scale">0%</fraction>
+ 
+    <bool name="def_install_non_market_apps">true</bool>
+
+
 </resources>

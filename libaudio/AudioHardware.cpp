@@ -57,12 +57,14 @@ AudioHardware::AudioHardware() :
     /*mCpcapGain*/
     mSpkrVolume(-1), mMicVolume(-1), mEcnsEnabled(0), mEcnsRequested(0), mBtScoOn(false)
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     ALOGV("AudioHardware constructor");
 }
 
 // designed to be called multiple times for retries
 status_t AudioHardware::init() {
 
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     if (mInit) {
         return NO_ERROR;
     }
@@ -111,6 +113,7 @@ error:
 
 AudioHardware::~AudioHardware()
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     ALOGV("AudioHardware destructor");
     for (size_t index = 0; index < mInputs.size(); index++) {
         closeInputStream((AudioStreamIn*)mInputs[index]);
@@ -125,6 +128,7 @@ AudioHardware::~AudioHardware()
 
 void AudioHardware::readHwGainFile()
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     int fd;
     int rc=0;
     int i;
@@ -156,12 +160,14 @@ void AudioHardware::readHwGainFile()
 
 status_t AudioHardware::initCheck()
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     return mInit ? NO_ERROR : NO_INIT;
 }
 
 AudioStreamOut* AudioHardware::openOutputStream(
         uint32_t devices, int *format, uint32_t *channels, uint32_t *sampleRate, status_t *status)
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     { // scope for the lock
         Mutex::Autolock lock(mLock);
 
@@ -203,7 +209,18 @@ AudioStreamOut* AudioHardware::openOutputStream(
     return mOutput;
 }
 
+
+#if 1
+//AudioHardwareInterface.cpp defines a default implementation
+AudioStreamOut* AudioHardware::openOutputStreamWithFlags(
+        uint32_t devices, audio_output_flags_t flags, int *format, uint32_t *channels, uint32_t *sampleRate, status_t *status) {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
+    return openOutputStream(devices, format, channels, sampleRate, status);
+}
+#endif
+
 void AudioHardware::closeOutputStream(AudioStreamOut* out) {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     Mutex::Autolock lock(mLock);
     if (mOutput == 0 || mOutput != out) {
         ALOGW("Attempt to close invalid output stream");
@@ -221,6 +238,7 @@ AudioStreamIn* AudioHardware::openInputStream(
         uint32_t devices, int *format, uint32_t *channels, uint32_t *sampleRate, status_t *status,
         AudioSystem::audio_in_acoustics acoustic_flags)
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     // check for valid input source
     if (!AudioSystem::isInputDevice((AudioSystem::audio_devices)devices)) {
         return 0;
@@ -248,6 +266,7 @@ AudioStreamIn* AudioHardware::openInputStream(
 
 void AudioHardware::closeInputStream(AudioStreamIn* in)
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     Mutex::Autolock lock(mLock);
 
     ssize_t index = mInputs.indexOf((AudioStreamInTegra *)in);
@@ -263,6 +282,7 @@ void AudioHardware::closeInputStream(AudioStreamIn* in)
 
 status_t AudioHardware::setMode(int mode)
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     AutoMutex lock(mLock);
     bool wasInCall = isInCall();
     ALOGV("setMode() : new %d, old %d", mode, mMode);
@@ -282,6 +302,7 @@ status_t AudioHardware::setMode(int mode)
 // Must be called with mLock held
 status_t AudioHardware::doStandby(int stop_fd, bool output, bool enable)
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     status_t status = NO_ERROR;
     struct cpcap_audio_stream standby;
 
@@ -354,12 +375,14 @@ status_t AudioHardware::doStandby(int stop_fd, bool output, bool enable)
 
 status_t AudioHardware::setMicMute(bool state)
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     Mutex::Autolock lock(mLock);
     return setMicMute_l(state);
 }
 
 status_t AudioHardware::setMicMute_l(bool state)
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     if (mMicMute != state) {
         mMicMute = state;
         ALOGV("setMicMute() %s", (state)?"ON":"OFF");
@@ -369,12 +392,14 @@ status_t AudioHardware::setMicMute_l(bool state)
 
 status_t AudioHardware::getMicMute(bool* state)
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     *state = mMicMute;
     return NO_ERROR;
 }
 
 status_t AudioHardware::setParameters(const String8& keyValuePairs)
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     AudioParameter param = AudioParameter(keyValuePairs);
     String8 value;
     String8 key;
@@ -422,6 +447,7 @@ status_t AudioHardware::setParameters(const String8& keyValuePairs)
 
 String8 AudioHardware::getParameters(const String8& keys)
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     AudioParameter request = AudioParameter(keys);
     AudioParameter reply = AudioParameter();
     String8 value;
@@ -442,6 +468,7 @@ String8 AudioHardware::getParameters(const String8& keys)
 
 size_t AudioHardware::getInputBufferSize(uint32_t sampleRate, int format, int channelCount)
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     size_t bufsize;
 
     if (format != AudioSystem::PCM_16_BIT) {
@@ -464,12 +491,45 @@ size_t AudioHardware::getInputBufferSize(uint32_t sampleRate, int format, int ch
     return bufsize;
 }
 
+//TARGET_LEGACY_UNSUPPORTED_LIBAUDIO
+status_t AudioHardware::setMasterMute(bool muted) {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
+    return NO_ERROR;
+}
+
+#if 1
+int AudioHardware::createAudioPatch(unsigned int num_sources,
+                               const struct audio_port_config *sources,
+                               unsigned int num_sinks,
+                               const struct audio_port_config *sinks,
+                               audio_patch_handle_t *handle) {
+    ALOGE("%s[%u]\n", __func__, __LINE__);
+    return NO_ERROR;
+}
+
+int AudioHardware::releaseAudioPatch(audio_patch_handle_t handle) {
+    ALOGE("%s[%u]\n", __func__, __LINE__);
+    return NO_ERROR;
+}
+
+int AudioHardware::getAudioPort(struct audio_port *port) {
+    ALOGE("%s[%u]\n", __func__, __LINE__);
+    return NO_ERROR;
+}
+
+int AudioHardware::setAudioPortConfig(const struct audio_port_config *config) {
+    ALOGE("%s[%u]\n", __func__, __LINE__);
+    return NO_ERROR;
+}
+#endif
+
 //setVoiceVolume is only useful for setting sidetone gains with a baseband
 //controlling volume.  Don't adjust hardware volume with this API.
 //
 //(On Stingray, don't use mVoiceVol for anything.)
 status_t AudioHardware::setVoiceVolume(float v)
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     if (v < 0.0)
         v = 0.0;
     else if (v > 1.0)
@@ -483,6 +543,7 @@ status_t AudioHardware::setVoiceVolume(float v)
 
 status_t AudioHardware::setMasterVolume(float v)
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     if (v < 0.0)
         v = 0.0;
     else if (v > 1.0)
@@ -508,6 +569,7 @@ status_t AudioHardware::setMasterVolume(float v)
 // Call with mLock held.
 status_t AudioHardware::setVolume_l(float v, int usecase)
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     int spkr = getGain(AUDIO_HW_GAIN_SPKR_GAIN, usecase);
     int mic = getGain(AUDIO_HW_GAIN_MIC_GAIN, usecase);
 
@@ -541,6 +603,7 @@ status_t AudioHardware::setVolume_l(float v, int usecase)
 
 uint8_t AudioHardware::getGain(int direction, int usecase)
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     int path;
     AudioStreamInTegra *input = getActiveInput_l();
     uint32_t inDev = (input == NULL) ? 0 : input->devices();
@@ -571,12 +634,14 @@ uint8_t AudioHardware::getGain(int direction, int usecase)
 
 int AudioHardware::getActiveInputRate()
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     AudioStreamInTegra *input = getActiveInput_l();
     return (input != NULL) ? input->sampleRate() : 0;
 }
 
 status_t AudioHardware::doRouting()
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     Mutex::Autolock lock(mLock);
     return doRouting_l();
 }
@@ -584,6 +649,7 @@ status_t AudioHardware::doRouting()
 // Call this with mLock held.
 status_t AudioHardware::doRouting_l()
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     if (!mOutput) {
         return NO_ERROR;
     }
@@ -804,6 +870,7 @@ status_t AudioHardware::doRouting_l()
 
 status_t AudioHardware::dumpInternals(int fd, const Vector<String16>& args)
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     const size_t SIZE = 256;
     char buffer[SIZE];
     String8 result;
@@ -822,6 +889,7 @@ status_t AudioHardware::dumpInternals(int fd, const Vector<String16>& args)
 
 status_t AudioHardware::dump(int fd, const Vector<String16>& args)
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     dumpInternals(fd, args);
     for (size_t index = 0; index < mInputs.size(); index++) {
         mInputs[index]->dump(fd, args);
@@ -835,6 +903,7 @@ status_t AudioHardware::dump(int fd, const Vector<String16>& args)
 
 uint32_t AudioHardware::getInputSampleRate(uint32_t sampleRate)
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     uint32_t i;
     uint32_t prevDelta;
     uint32_t delta;
@@ -863,6 +932,7 @@ AudioHardware::AudioStreamInTegra *AudioHardware::getActiveInput_l()
 
 void AudioHardware::setEcnsRequested_l(int ecns, bool enabled)
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     if (enabled) {
         mEcnsRequested |= ecns;
     } else {
@@ -877,9 +947,11 @@ void AudioHardware::setEcnsRequested_l(int ecns, bool enabled)
 AudioHardware::AudioStreamSrc::AudioStreamSrc() :
         mSrcBuffer(NULL), mSrcInitted(false)
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
 }
 AudioHardware::AudioStreamSrc::~AudioStreamSrc()
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     if (mSrcBuffer != NULL) {
         delete[] mSrcBuffer;
     }
@@ -887,6 +959,7 @@ AudioHardware::AudioStreamSrc::~AudioStreamSrc()
 
 void AudioHardware::AudioStreamSrc::init(int inRate, int outRate)
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     if (mSrcBuffer == NULL) {
         mSrcBuffer = new char[src_memory_required_stereo(MAX_FRAME_LEN, MAX_CONVERT_RATIO)];
     }
@@ -923,12 +996,14 @@ AudioHardware::AudioStreamOutTegra::AudioStreamOutTegra() :
     mState(AUDIO_STREAM_IDLE), /*mSrc*/ mLocked(false), mDriverRate(AUDIO_HW_OUT_SAMPLERATE),
     mInit(false)
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     ALOGV("AudioStreamOutTegra constructor");
 }
 
 // designed to be called multiple times for retries
 status_t AudioHardware::AudioStreamOutTegra::init()
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     if (mInit) {
         return NO_ERROR;
     }
@@ -971,6 +1046,7 @@ error:
 
 status_t AudioHardware::AudioStreamOutTegra::initCheck()
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     return mInit ? NO_ERROR : NO_INIT;
 }
 
@@ -978,6 +1054,7 @@ status_t AudioHardware::AudioStreamOutTegra::initCheck()
 void AudioHardware::AudioStreamOutTegra::setDriver_l(
         bool speaker, bool bluetooth, bool spdif, int sampleRate)
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     ALOGV("Out setDriver_l() Analog speaker? %s. Bluetooth? %s. S/PDIF? %s. sampleRate %d",
         speaker?"yes":"no", bluetooth?"yes":"no", spdif?"yes":"no", sampleRate);
 
@@ -999,6 +1076,7 @@ void AudioHardware::AudioStreamOutTegra::setDriver_l(
 status_t AudioHardware::AudioStreamOutTegra::set(
         AudioHardware* hw, uint32_t devices, int *pFormat, uint32_t *pChannels, uint32_t *pRate)
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     int lFormat = pFormat ? *pFormat : 0;
     uint32_t lChannels = pChannels ? *pChannels : 0;
     uint32_t lRate = pRate ? *pRate : 0;
@@ -1044,6 +1122,7 @@ status_t AudioHardware::AudioStreamOutTegra::set(
 
 AudioHardware::AudioStreamOutTegra::~AudioStreamOutTegra()
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     standby();
     // Prevent someone from flushing the fd during a close.
     Mutex::Autolock lock(mFdLock);
@@ -1058,6 +1137,7 @@ AudioHardware::AudioStreamOutTegra::~AudioStreamOutTegra()
 
 ssize_t AudioHardware::AudioStreamOutTegra::write(const void* buffer, size_t bytes)
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     status_t status;
     if (!mHardware) {
         ALOGE("%s: mHardware is null", __FUNCTION__);
@@ -1270,6 +1350,7 @@ error:
 
 void AudioHardware::AudioStreamOutTegra::flush()
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     // Prevent someone from writing the fd while we flush
     Mutex::Autolock lock(mFdLock);
     flush_l();
@@ -1277,6 +1358,7 @@ void AudioHardware::AudioStreamOutTegra::flush()
 
 void AudioHardware::AudioStreamOutTegra::flush_l()
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     ALOGV("AudioStreamOutTegra::flush()");
     if (::ioctl(mFdCtl, TEGRA_AUDIO_OUT_FLUSH) < 0)
        ALOGE("could not flush playback: %s", strerror(errno));
@@ -1291,6 +1373,7 @@ void AudioHardware::AudioStreamOutTegra::flush_l()
 // to be removed when root cause is fixed
 void AudioHardware::AudioStreamOutTegra::setNumBufs(int numBufs)
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     Mutex::Autolock lock(mFdLock);
     ALOGV("AudioStreamOutTegra::setNumBufs(%d)", numBufs);
     if (::ioctl(mFdCtl, TEGRA_AUDIO_OUT_SET_NUM_BUFS, &numBufs) < 0)
@@ -1300,6 +1383,7 @@ void AudioHardware::AudioStreamOutTegra::setNumBufs(int numBufs)
 // Called with mLock and mHardware->mLock held
 status_t AudioHardware::AudioStreamOutTegra::online_l()
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     status_t status = NO_ERROR;
 
     if (mState < AUDIO_STREAM_NEW_RATE_REQ) {
@@ -1371,6 +1455,7 @@ status_t AudioHardware::AudioStreamOutTegra::online_l()
 
 status_t AudioHardware::AudioStreamOutTegra::standby()
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     if (!mHardware) {
         return NO_INIT;
     }
@@ -1409,6 +1494,7 @@ status_t AudioHardware::AudioStreamOutTegra::standby()
 
 status_t AudioHardware::AudioStreamOutTegra::dump(int fd, const Vector<String16>& args)
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     const size_t SIZE = 256;
     char buffer[SIZE];
     String8 result;
@@ -1442,11 +1528,13 @@ status_t AudioHardware::AudioStreamOutTegra::dump(int fd, const Vector<String16>
 
 bool AudioHardware::AudioStreamOutTegra::getStandby()
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     return mState == AUDIO_STREAM_IDLE;;
 }
 
 status_t AudioHardware::AudioStreamOutTegra::setParameters(const String8& keyValuePairs)
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     AudioParameter param = AudioParameter(keyValuePairs);
     String8 key = String8(AudioParameter::keyRouting);
     status_t status = NO_ERROR;
@@ -1470,6 +1558,7 @@ status_t AudioHardware::AudioStreamOutTegra::setParameters(const String8& keyVal
 
 String8 AudioHardware::AudioStreamOutTegra::getParameters(const String8& keys)
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     AudioParameter param = AudioParameter(keys);
     String8 value;
     String8 key = String8(AudioParameter::keyRouting);
@@ -1485,7 +1574,23 @@ String8 AudioHardware::AudioStreamOutTegra::getParameters(const String8& keys)
 
 status_t AudioHardware::AudioStreamOutTegra::getRenderPosition(uint32_t *dspFrames)
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     //TODO: enable when supported by driver
+    return -ENODEV;
+}
+
+#if 1
+status_t AudioHardware::AudioStreamOutTegra::getPresentationPosition(uint64_t *frames, struct timespec *timestamp)
+{
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
+    //TODO: enable when supported by driver
+    return -ENODEV;
+}
+#endif
+
+// default implementation is unsupported
+status_t AudioHardware::AudioStreamOutTegra::getNextWriteTimestamp(int64_t *timestamp)
+{
     return INVALID_OPERATION;
 }
 
@@ -1501,6 +1606,7 @@ AudioHardware::AudioStreamInTegra::AudioStreamInTegra() :
     mSource(AUDIO_SOURCE_DEFAULT), mLocked(false), mTotalBuffersRead(0),
     mDriverRate(AUDIO_HW_IN_SAMPLERATE), mEcnsRequested(0)
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     ALOGV("AudioStreamInTegra constructor");
 }
 
@@ -1509,6 +1615,7 @@ status_t AudioHardware::AudioStreamInTegra::set(
         AudioHardware* hw, uint32_t devices, int *pFormat, uint32_t *pChannels, uint32_t *pRate,
         AudioSystem::audio_in_acoustics acoustic_flags)
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     Mutex::Autolock lock(mLock);
     status_t status = BAD_VALUE;
     mHardware = hw;
@@ -1553,6 +1660,7 @@ status_t AudioHardware::AudioStreamInTegra::set(
 
 AudioHardware::AudioStreamInTegra::~AudioStreamInTegra()
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     ALOGV("AudioStreamInTegra destructor");
 
     standby();
@@ -1562,6 +1670,7 @@ AudioHardware::AudioStreamInTegra::~AudioStreamInTegra()
 // Called with mHardware->mLock and mLock held.
 void AudioHardware::AudioStreamInTegra::setDriver_l(bool mic, bool bluetooth, int sampleRate)
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     ALOGV("In setDriver_l() Analog mic? %s. Bluetooth? %s.", mic?"yes":"no", bluetooth?"yes":"no");
 
     // force some reconfiguration at next read()
@@ -1579,6 +1688,7 @@ void AudioHardware::AudioStreamInTegra::setDriver_l(bool mic, bool bluetooth, in
 
 ssize_t AudioHardware::AudioStreamInTegra::read(void* buffer, ssize_t bytes)
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     status_t status;
     if (!mHardware) {
         ALOGE("%s: mHardware is null", __FUNCTION__);
@@ -1713,11 +1823,13 @@ error:
 
 bool AudioHardware::AudioStreamInTegra::getStandby() const
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     return mState == AUDIO_STREAM_IDLE;
 }
 
 status_t AudioHardware::AudioStreamInTegra::standby()
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     if (!mHardware) {
         return NO_INIT;
     }
@@ -1756,6 +1868,7 @@ status_t AudioHardware::AudioStreamInTegra::standby()
 // Called with mLock and mHardware->mLock held
 status_t AudioHardware::AudioStreamInTegra::online_l()
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     status_t status = NO_ERROR;
 
     reopenReconfigDriver();
@@ -1824,6 +1937,7 @@ status_t AudioHardware::AudioStreamInTegra::online_l()
 // serves a similar purpose as the init() method of other classes
 void AudioHardware::AudioStreamInTegra::reopenReconfigDriver()
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
 #ifdef USE_PROPRIETARY_AUDIO_EXTENSIONS
     if (mHardware->mEcnsEnabled) {
         mHardware->mAudioPP.enableEcns(0);
@@ -1863,6 +1977,7 @@ void AudioHardware::AudioStreamInTegra::reopenReconfigDriver()
 
 status_t AudioHardware::AudioStreamInTegra::dump(int fd, const Vector<String16>& args)
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     const size_t SIZE = 256;
     char buffer[SIZE];
     String8 result;
@@ -1889,6 +2004,7 @@ status_t AudioHardware::AudioStreamInTegra::dump(int fd, const Vector<String16>&
 
 status_t AudioHardware::AudioStreamInTegra::setParameters(const String8& keyValuePairs)
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     AudioParameter param = AudioParameter(keyValuePairs);
     String8 key = String8(AudioParameter::keyRouting);
     status_t status = NO_ERROR;
@@ -1923,6 +2039,7 @@ status_t AudioHardware::AudioStreamInTegra::setParameters(const String8& keyValu
 
 String8 AudioHardware::AudioStreamInTegra::getParameters(const String8& keys)
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     AudioParameter param = AudioParameter(keys);
     String8 value;
     String8 key = String8(AudioParameter::keyRouting);
@@ -1938,6 +2055,7 @@ String8 AudioHardware::AudioStreamInTegra::getParameters(const String8& keys)
 
 unsigned int  AudioHardware::AudioStreamInTegra::getInputFramesLost() const
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     Mutex::Autolock _l(mFramesLock);
     unsigned int lostFrames = 0;
     if (!getStandby()) {
@@ -1961,6 +2079,7 @@ unsigned int  AudioHardware::AudioStreamInTegra::getInputFramesLost() const
 // must be called with mLock and mFdLock held
 void AudioHardware::AudioStreamInTegra::stop_l()
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     ALOGV("AudioStreamInTegra::stop_l() starts");
     if (::ioctl(mFdCtl, TEGRA_AUDIO_IN_STOP) < 0) {
         ALOGE("could not stop recording: %d %s", errno, strerror(errno));
@@ -1970,6 +2089,7 @@ void AudioHardware::AudioStreamInTegra::stop_l()
 
 void AudioHardware::AudioStreamInTegra::updateEcnsRequested(effect_handle_t effect, bool enabled)
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
 #ifdef USE_PROPRIETARY_AUDIO_EXTENSIONS
     effect_descriptor_t desc;
     status_t status = (*effect)->get_descriptor(effect, &desc);
@@ -1994,12 +2114,14 @@ void AudioHardware::AudioStreamInTegra::updateEcnsRequested(effect_handle_t effe
 
 status_t AudioHardware::AudioStreamInTegra::addAudioEffect(effect_handle_t effect)
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     updateEcnsRequested(effect, true);
     return NO_ERROR;
 }
 
 status_t AudioHardware::AudioStreamInTegra::removeAudioEffect(effect_handle_t effect)
 {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     updateEcnsRequested(effect, false);
     return NO_ERROR;
 }
@@ -2007,6 +2129,7 @@ status_t AudioHardware::AudioStreamInTegra::removeAudioEffect(effect_handle_t ef
 // ----------------------------------------------------------------------------
 
 extern "C" AudioHardwareInterface* createAudioHardware(void) {
+    //ALOGE("%s[%u]\n", __func__, __LINE__);
     AudioHardware *hw = new AudioHardware();
     for (unsigned tries = 0; tries < MAX_INIT_TRIES; ++tries) {
         if (NO_ERROR == hw->init())

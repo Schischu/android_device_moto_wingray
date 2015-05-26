@@ -32,7 +32,9 @@
 #include "AccelerationSensor.h"
 #include "LightSensor.h"
 #include "AkmSensor.h"
+#if 0
 #include "PressureSensor.h"
+#endif
 #include "GyroSensor.h"
 
 /*****************************************************************************/
@@ -48,11 +50,13 @@ struct sensors_poll_context_t {
 
 private:
     enum {
-	acceleration    = 0,
-	light           = 1,
-	akm		= 2,
-	pressure	= 3,
-	gyro		= 4,
+        acceleration    = 0,
+        light,
+        akm,
+#if 0
+        pressure,
+#endif
+        gyro,
         numSensorDrivers,
         numFds,
     };
@@ -74,8 +78,10 @@ private:
                 return gyro;
             case ID_L:
                 return light;
+#if 0
 	    case ID_B:
                 return pressure;
+#endif
         }
         return -EINVAL;
     }
@@ -100,10 +106,12 @@ sensors_poll_context_t::sensors_poll_context_t()
     mPollFds[akm].events = POLLIN;
     mPollFds[akm].revents = 0;
 
+#if 0
     mSensors[pressure] = new PressureSensor();
     mPollFds[pressure].fd = mSensors[pressure]->getFd();
     mPollFds[pressure].events = POLLIN;
     mPollFds[pressure].revents = 0;
+#endif
 
     mSensors[gyro] = new GyroSensor();
     mPollFds[gyro].fd = mSensors[gyro]->getFd();
