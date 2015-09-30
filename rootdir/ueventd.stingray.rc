@@ -28,3 +28,6 @@
 
 #sysfs properties
 /sys/devices/platform/tegra-ehci.2/usb2/* remove 0220 radio radio
+
+# rfkill
+/dev/rfkill            0660    wifi    wifi

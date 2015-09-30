@@ -48,5 +48,4 @@
 # NEWER CLEAN STEPS MUST BE AT THE END OF THE LIST
 # ************************************************
 $(call add-clean-step, rm -rf $(PRODUCT_OUT)/root/default.prop)
-$(call add-clean-step, rm -rf $(PRODUCT_OUT)/system/etc/permissions/android.hardware.wifi.direct.xml)
-$(call add-clean-step, rm -rf $(TARGET_OUT)/etc/permissions/android.hardware.bluetooth_le.xml)
+$(call add-clean-step, rm -rf $(PRODUCT_OUT)/obj/APPS/Phone_intermediates)

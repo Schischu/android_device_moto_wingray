@@ -12,101 +12,102 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Emit commands needed for Motorola devices during OTA installation
-(installing the MBM, CDT, LBL and BP images)."""
+"""Emit commands needed for Prime during OTA installation
+(installing the bootloader and radio images)."""
 
 import common
 
 def FullOTA_InstallEnd(info):
   try:
-    WriteBPUpdate(info,info.input_zip.read("RADIO/rdl.bin"),
-                info.input_zip.read("RADIO/bp.img"))
+    bootloader_img = info.input_zip.read("RADIO/bootloader.img")
   except KeyError:
-    print ("warning: rdl.bin and/or bp.img not in input target_files; "
-           "skipping BP update")
-  if info.extras.get("mbm", None) == "consumer":
-    try:
-      info.input_zip.getinfo("RADIO/mbm_consumer.bin")
-      Write2FullOTAPackage(info, "mbm", "mbm_consumer.bin")
-    except KeyError, e:
-      print ("warning: mbm_consumer.bin not in input target_files; "
-             "skipping MBM update")
+    print "no bootloader.img in target_files; skipping install"
   else:
-    Write2FullOTAPackage(info, "mbm", "mbm.bin")
-  Write2FullOTAPackage(info, "lbl", "lbl")
-  Write2FullOTAPackage(info, "cdt", "cdt.bin")
+    WriteBootloader(info, bootloader_img)
+
+  try:
+    radio_img = info.input_zip.read("RADIO/radio.img")
+  except KeyError:
+    print "no radio.img in target_files; skipping install"
+  else:
+    WriteRadio(info, radio_img)
+
+def IncrementalOTA_VerifyEnd(info):
+  try:
+    target_radio_img = info.target_zip.read("RADIO/radio.img")
+    source_radio_img = info.source_zip.read("RADIO/radio.img")
+  except KeyError:
+    # No source or target radio. Nothing to verify
+    pass
+  else:
+    if source_radio_img != target_radio_img:
+      info.script.CacheFreeSpaceCheck(len(source_radio_img))
+      radio_type, radio_device = common.GetTypeAndDevice("/radio", info.info_dict)
+      info.script.PatchCheck("%s:%s:%d:%s:%d:%s" % (
+          radio_type, radio_device,
+          len(source_radio_img), common.sha1(source_radio_img).hexdigest(),
+          len(target_radio_img), common.sha1(target_radio_img).hexdigest()))
 
 def IncrementalOTA_InstallEnd(info):
-  WriteBP2IncrementalPackage(info)
-  if info.extras.get("mbm", None) == "consumer":
+  try:
+    target_bootloader_img = info.target_zip.read("RADIO/bootloader.img")
     try:
-      info.target_zip.getinfo("RADIO/mbm_consumer.bin")
-      Write2IncrementalPackage(info, "mbm", "mbm_consumer.bin")
-    except KeyError, e:
-      print ("warning: mbm_consumer.bin not in input target_files; "
-             "skipping MBM update")
+      source_bootloader_img = info.source_zip.read("RADIO/bootloader.img")
+    except KeyError:
+      source_bootloader_img = None
+
+    if source_bootloader_img == target_bootloader_img:
+      print "bootloader unchanged; skipping"
+    else:
+      WriteBootloader(info, target_bootloader_img)
+  except KeyError:
+    print "no bootloader.img in target target_files; skipping install"
+
+  try:
+    target_radio_img = info.target_zip.read("RADIO/radio.img")
+    try:
+      source_radio_img = info.source_zip.read("RADIO/radio.img")
+    except KeyError:
+      source_radio_img = None
+
+    WriteRadio(info, target_radio_img, source_radio_img)
+  except KeyError:
+    print "no radio.img in target target_files; skipping install"
+
+def WriteBootloader(info, bootloader_img):
+  common.ZipWriteStr(info.output_zip, "bootloader.img", bootloader_img)
+  fstab = info.info_dict["fstab"]
+
+  info.script.Print("Writing bootloader...")
+  info.script.AppendExtra('''assert(samsung.write_bootloader(
+    package_extract_file("bootloader.img"), "%s", "%s"));''' % \
+    (fstab["/xloader"].device, fstab["/sbl"].device))
+
+def WriteRadio(info, target_radio_img, source_radio_img=None):
+  tf = common.File("radio.img", target_radio_img)
+  if source_radio_img is None:
+    tf.AddToZip(info.output_zip)
+    info.script.Print("Writing radio...")
+    info.script.WriteRawImage("/radio", tf.name)
   else:
-    Write2IncrementalPackage(info, "mbm", "mbm.bin")
-  Write2IncrementalPackage(info, "lbl", "lbl")
-  Write2IncrementalPackage(info, "cdt", "cdt.bin")
-
-#Append BP image and BP update agent(RDL, run in BP side) to package
-def WriteBPUpdate(info, rdl_bin, bp_bin):
-  common.ZipWriteStr(info.output_zip, "rdl.bin",
-                     rdl_bin)
-  common.ZipWriteStr(info.output_zip, "bp.img",
-                     bp_bin)
-  # this only works with edify; motorola devices never use amend.
-  info.script.AppendExtra('''assert(package_extract_file("bp.img", "/tmp/bp.img"),
-       package_extract_file("rdl.bin", "/tmp/rdl.bin"),
-       moto.update_cdma_bp("/tmp/rdl.bin", "/tmp/bp.img"),
-       delete("/tmp/bp.img", "/tmp/rdl.bin"));''')
-
-#Append BP image and RDL to incremental package
-def WriteBP2IncrementalPackage(info):
-  try:
-    target_rdl = info.target_zip.read("RADIO/rdl.bin")
-    target_bp = info.target_zip.read("RADIO/bp.img")
-    try:
-      source_bp = info.source_zip.read("RADIO/bp.img")
-      if source_bp == target_bp:
-        print("BP images unchanged; skipping")
+    sf = common.File("radio.img", source_radio_img);
+    if tf.sha1 == sf.sha1:
+      print "radio image unchanged; skipping"
+    else:
+      diff = common.Difference(tf, sf)
+      common.ComputeDifferences([diff])
+      _, _, d = diff.GetPatch()
+      if d is None or len(d) > tf.size * common.OPTIONS.patch_threshold:
+        # computing difference failed, or difference is nearly as
+        # big as the target:  simply send the target.
+        tf.AddToZip(info.output_zip)
+        info.script.Print("Writing radio...")
+        info.script.WriteRawImage("/radio", tf.name)
       else:
-        print("BP image changed; including")
-        info.script.Print("Writing RDL/BP image...")
-        WriteBPUpdate(info,target_rdl,target_bp)
-    except KeyError:
-      print("warning: no rdl.bin and/or bp.img in source_files; just use target")
-      info.script.Print("Writing RDL/BP image...")
-      WriteBPUpdate(info,target_rdl,target_bp)
-  except KeyError:
-    print("warning: no rdl.bin and/or bp.img in target_files; not flashing")
-
-#Append raw image update to package
-def Write2FullOTAPackage(info, dev_name, bin_name):
-  try:
-    common.ZipWriteStr(info.output_zip, bin_name,
-                       info.input_zip.read("RADIO/"+bin_name))
-    info.script.WriteRawImage(dev_name, bin_name)
-  except KeyError:
-    print ("warning: no "+ bin_name +" in input target_files; not flashing")
-
-#Append raw image update to incremental package
-def Write2IncrementalPackage(info, dev_name, bin_name):
-  try:
-    file_name = "RADIO/" + bin_name;
-    target = info.target_zip.read(file_name);
-    try:
-      source = info.source_zip.read(file_name);
-      if source == target:
-        print(dev_name + " image unchanged; skipping")
-      else:
-        print(dev_name + " image changed; including")
-        common.ZipWriteStr(info.output_zip, bin_name, target)
-        info.script.WriteRawImage(dev_name, bin_name)
-    except KeyError:
-      print("warning: no "+ bin_name +" in source_files; just use target")
-      common.ZipWriteStr(info.output_zip, bin_name, target)
-      info.script.WriteRawImage(dev_name, bin_name)
-  except KeyError:
-    print("warning: no "+ bin_name +" in target_files; not flashing")
+        common.ZipWriteStr(info.output_zip, "radio.img.p", d)
+        info.script.Print("Patching radio...")
+        radio_type, radio_device = common.GetTypeAndDevice("/radio", info.info_dict)
+        info.script.ApplyPatch(
+            "%s:%s:%d:%s:%d:%s" % (radio_type, radio_device,
+                                   sf.size, sf.sha1, tf.size, tf.sha1),
+            "-", tf.size, tf.sha1, sf.sha1, "radio.img.p")

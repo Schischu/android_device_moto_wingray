@@ -13,8 +13,8 @@
 # limitations under the License.
 #
 
-DEVICE_PACKAGE_OVERLAYS := $(LOCAL_PATH)/overlay-common
-
+DEVICE_PACKAGE_OVERLAYS := $(LOCAL_PATH)/overlay
+    
 PRODUCT_AAPT_CONFIG := xlarge mdpi hdpi
 PRODUCT_AAPT_PREF_CONFIG := mdpi
 
@@ -55,8 +55,8 @@ PRODUCT_COPY_FILES += \
 PRODUCT_PROPERTY_OVERRIDES := \
     wifi.interface=wlan0 \
     wifi.supplicant_scan_interval=15
-    
-PRODUCT_PROPERTY_OVERRIDES := \
+
+PRODUCT_PROPERTY_OVERRIDES += \
     media.stagefright.cache-params=6144/-1/30 \
     ro.sf.lcd_density=160 \
     dalvik.vm.dexopt-data-only=1 \
@@ -74,7 +74,6 @@ PRODUCT_PACKAGES := \
 	libwpa_client \
 	hostapd \
 	wpa_supplicant \
-	wpa_supplicant.conf \
 	dhcpcd.conf \
 	su
 
@@ -85,19 +84,19 @@ PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
 	persist.sys.root_access=1
 
 #PRODUCT_COPY_FILES += \
-#    $(LOCAL_PATH)/wifi/wpa_supplicant.conf:system/etc/wifi/wpa_supplicant.conf
 
 PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/wifi/wpa_supplicant.conf:system/etc/wifi/wpa_supplicant.conf \
     $(LOCAL_PATH)/wifi/wpa_supplicant_overlay.conf:system/etc/wifi/wpa_supplicant_overlay.conf \
-    $(LOCAL_PATH)/wifi/p2p_supplicant_overlay.conf:system/etc/wifi/p2p_supplicant_overlay.conf
+    $(LOCAL_PATH)/wifi/p2p_supplicant_overlay.conf:system/etc/wifi/p2p_supplicant_overlay.conf \
+    $(LOCAL_PATH)/wifi/hostapd_default.conf:system/etc/hostapd/hostapd_default.conf
 
 #PRODUCT_COPY_FILES += \
-#    $(LOCAL_PATH)/wifi/hostapd_default.conf:system/etc/hostapd/hostapd_default.conf
 #    $(LOCAL_PATH)/wifi/bcmdhd_mfg.bin:system/etc/wifi/bcmdhd_mfg.bin \
 #    $(LOCAL_PATH)/wifi/bcmdhd_apsta.bin:system/etc/wifi/bcmdhd_apsta.bin \
 #    $(LOCAL_PATH)/wifi/bcmdhd_p2p.bin:system/etc/wifi/bcmdhd_p2p.bin \
 #    $(LOCAL_PATH)/wifi/bcmdhd_sta.bin:system/etc/wifi/bcmdhd_sta.bin \
-    
+
 #Prebuilt chromium
 #COPY IN LIB/ARM SYMLINK
 #PRODUCT_COPY_FILES += \
@@ -116,8 +115,8 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/init/init:root/init
 
-PRODUCT_PACKAGES += \
-    hwcomposer.tegra
+#PRODUCT_PACKAGES += \
+#    hwcomposer.tegra
 
 # Omni packages
 PRODUCT_PACKAGES += \
@@ -128,12 +127,11 @@ PRODUCT_COPY_FILES += \
         device/moto/wingray/audio/audio_policy.conf:system/etc/audio_policy.conf
 
 PRODUCT_PACKAGES += \
+        audio.primary.stingray \
         audio_policy.stingray \
         audio.a2dp.default \
         libaudioutils \
         libtinyalsa
-
-#        audio.primary.stingray
 
 PRODUCT_PACKAGES += \
         lights.stingray
@@ -186,8 +184,7 @@ PRODUCT_PACKAGES += \
 	make_ext4fs \
 	setup_fs
 
-DEVICE_PACKAGE_OVERLAYS := \
-    $(LOCAL_PATH)/overlay
+
 
 $(call inherit-product, frameworks/native/build/tablet-dalvik-heap.mk)
 $(call inherit-product, vendor/omni/config/common_tablet.mk)
