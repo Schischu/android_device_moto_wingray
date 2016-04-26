@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 The Android Open Source Project
+ * Copyright 2016 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,24 +14,17 @@
  * limitations under the License.
  */
 
-#define LOG_TAG "lights"
-
+//#define LOG_NDEBUG 0
+#define LOG_TAG "LibLightsHAL"
 #include <cutils/log.h>
-
-#include <dirent.h>
-#include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <pthread.h>
-
-#include <linux/input.h>
-
 #include <sys/ioctl.h>
-#include <sys/poll.h>
 #include <sys/types.h>
-
 #include <hardware/lights.h>
 
 #define LIGHT_ATTENTION	1
@@ -258,12 +251,13 @@ static int open_lights(const struct hw_module_t *module, char const *name,
 
 	if (0 == strcmp(LIGHT_ID_BACKLIGHT, name))
 		set_light = set_light_backlight;
+
+	else if (0 == strcmp(LIGHT_ID_BATTERY, name))
+		set_light = set_light_battery;
 	else if (0 == strcmp(LIGHT_ID_NOTIFICATIONS, name))
 		set_light = set_light_notifications;
 	else if (0 == strcmp(LIGHT_ID_ATTENTION, name))
 		set_light = set_light_attention;
-	else if (0 == strcmp(LIGHT_ID_BATTERY, name))
-		set_light = set_light_battery;
 	else
 		return -EINVAL;
 
@@ -287,9 +281,6 @@ static struct hw_module_methods_t lights_module_methods = {
 	.open = open_lights,
 };
 
-/*
- * The lights Module
- */
 struct hw_module_t HAL_MODULE_INFO_SYM = {
 	.tag = HARDWARE_MODULE_TAG,
 	.version_major = 1,

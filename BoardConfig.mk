@@ -1,4 +1,5 @@
-# Copyright (C) 2010 The Android Open Source Project
+#
+# Copyright 2016 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,35 +14,31 @@
 # limitations under the License.
 #
 
-
--include vendor/broadcom/wingray/BoardConfigVendor.mk
--include vendor/moto/wingray/BoardConfigVendor.mk
--include vendor/nvidia/wingray/BoardConfigVendor.mk
-
 DEVICE_PACKAGE_OVERLAYS += $(LOCAL_PATH)/overlay
 
+# Architecture
+TARGET_ARCH := arm
+TARGET_CPU_VARIANT := cortex-a9
+# TARGET_CPU_VARIANT := tegra2
 TARGET_CPU_ABI := armeabi-v7a
 TARGET_CPU_ABI2 := armeabi
-TARGET_CPU_SMP := true
-TARGET_ARCH := arm
 TARGET_ARCH_VARIANT := armv7-a
 TARGET_ARCH_VARIANT_CPU := cortex-a9
-TARGET_CPU_VARIANT := tegra2
-
 TARGET_ARCH_VARIANT_FPU := vfpv3-d16
-
+TARGET_CPU_SMP := true
 TARGET_BOARD_PLATFORM := tegra
+ARCH_ARM_HAVE_TLS_REGISTER := true
 
-TARGET_USERIMAGES_USE_EXT4 := true
+
 # Kernel
-BOARD_PAGE_SIZE := 2048
 BOARD_KERNEL_BASE := 0x10000000
+#Which one is correct?
+BOARD_PAGE_SIZE := 2048
+BOARD_KERNEL_PAGESIZE := 2048
+TARGET_KERNEL_CONFIG := elementalxvanilla_defconfig
+TARGET_KERNEL_SOURCE := kernel/moto/stingray-kernel
 BOARD_KERNEL_CMDLINE := androidboot.carrier=wifi-only product_type=w
 
-
-# TARGET_KERNEL_SOURCE := kernel/moto/stingray
-# TARGET_KERNEL_CONFIG := elementalxvanilla_defconfig
-TARGET_PREBUILT_KERNEL := device/moto/wingray/kernel
 
 # Healthd
 BOARD_AC_SYSFS_PATH := $(BOARD_POWER_SUPPLY_PATH)/ac
@@ -51,6 +48,7 @@ BOARD_CHARGER_DIM_SCREEN_BRIGHTNESS := true
 # Filesystem
 BOARD_SYSTEMIMAGE_PARTITION_SIZE := 1056858112
 BOARD_USERDATAIMAGE_PARTITION_SIZE := 29859115008
+BOARD_CACHEIMAGE_PARTITION_SIZE := 528429056
 BOARD_FLASH_BLOCK_SIZE := 4096
 # Use this flag if the board has a ext4 partition larger than 2gb
 BOARD_HAS_LARGE_FILESYSTEM := true
@@ -85,8 +83,6 @@ BOARD_EGL_WORKAROUND_BUG_10194508 := true
 SKIP_SET_METADATA := true
 BOARD_USE_MHEAP_SCREENSHOT := true
 
-#SAMSUNG_T20_HWCOMPOSER: It seems that the samsung hwc has a bug, so this define should only be needed on p3/p4
-#BOARD_HAVE_SAMSUNG_T20_HWCOMPOSER := true
 #BOARD_EGL_NEEDS_LEGACY_FB := true
 BOARD_NEEDS_OLD_HWC_API := true
 
@@ -108,6 +104,7 @@ TARGET_BOOTANIMATION_PRELOAD := true
 TARGET_BOOTANIMATION_TEXTURE_CACHE := true
 TARGET_BOOTANIMATION_USE_RGB565 := true
 TARGET_BOOTLOADER_BOARD_NAME := stingray
+TARGET_USERIMAGES_USE_EXT4 := true
 
 # PRODUCT_PREBUILT_WEBVIEWCHROMIUM := yes
 
@@ -142,7 +139,6 @@ BOARD_HAS_NO_SELECT_BUTTON := true
 
 # Misc flags
 ARCH_ARM_HIGH_OPTIMIZATION := true
-ARCH_ARM_HAVE_TLS_REGISTER := true
 ARCH_ARM_USE_NON_NEON_MEMCPY := true
 MALLOC_IMPL := dlmalloc
 COMMON_GLOBAL_CFLAGS += -DNEEDS_VECTORIMPL_SYMBOLS #flash compatibility
@@ -150,50 +146,21 @@ TARGET_ENABLE_NON_PIE_SUPPORT := true
 
 COMMON_GLOBAL_CFLAGS += -DREFBASE_JB_MR1_COMPAT_SYMBOLS #system/core/libutils/RefBase.cpp
 
+# Optimization hwui
+HWUI_COMPILE_FOR_PERF := true
+
 # COMMON_GLOBAL_CFLAGS += -DICS_AUDIO_BLOB #system/core/include/system/audio.h
 
 BOARD_SUPPRESS_EMMC_WIPE := true
-TARGET_RECOVERY_PIXEL_FORMAT := "RGBX_8888"
-TARGET_RECOVERY_FSTAB = device/moto/wingray/fstab.stingray
 
 #TARGET_ENABLE_OFFLOAD_ENHANCEMENTS := true
 
 TARGET_RELEASETOOLS_EXTENSIONS := device/moto/wingray
-#TWRP config
-DEVICE_RESOLUTION := 1280x800
-RECOVERY_SDCARD_ON_DATA := true
-WIPE_IS_SUPPORTED := false
-
-#A BOARD_CUSTOM_GRAPHICS := ../../../device/samsung/p4-common/recovery/graphics.c
-#A BOARD_CUSTOM_RECOVERY_KEYMAPPING := ../../device/samsung/p4-common/recovery/recovery_ui.c
-
-TW_ALWAYS_RMRF := true
-TW_DISABLE_TTF := true
-#TW_USE_TOOLBOX := true #causes weirdness. do not use. kill supersu instead
-
-TW_HAS_DOWNLOAD_MODE := true
-TW_NO_REBOOT_BOOTLOADER := true
-
-# Suppress EMMC WIPE
-SUPPRESS_EMMC_WIPE := true
-SUPPRESS_SECURE_ERASE := true
-
-TW_NO_EXFAT := true
-TW_NO_EXFAT_FUSE := true
-
-TW_FLASH_FROM_STORAGE := true
-TW_NO_USB_STORAGE := true
-TW_DEFAULT_EXTERNAL_STORAGE := true
-
-TW_EXCLUDE_SUPERSU := true
-
-TW_BRIGHTNESS_PATH := "/sys/devices/platform/tegra-i2c.0/i2c-0/0-002c/leds/lcd-backlight/brightness"
-TW_MAX_BRIGHTNESS := 255
-
-TW_INTERNAL_STORAGE_PATH := "/data/media"
-TW_INTERNAL_STORAGE_MOUNT_POINT := "data"
-TW_EXTERNAL_STORAGE_PATH := "/sdcard"
-TW_EXTERNAL_STORAGE_MOUNT_POINT := "sdcard"
 
 HAVE_SELINUX := true
 #WITH_DEXPREOPT := true
+
+TARGET_RECOVERY_FSTAB := device/moto/wingray/fstab.stingray
+
+# inherit from the proprietary version
+-include vendor/samsung/wingray/BoardConfigVendor.mk

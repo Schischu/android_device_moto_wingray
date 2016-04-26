@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 #include <hardware/sensors.h>
 #include <fcntl.h>
 #include <errno.h>

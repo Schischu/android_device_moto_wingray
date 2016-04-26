@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
+ * Copyright (C) 2016 Schischu
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,7 +75,7 @@ static void sysfs_write(char *path, char *s)
     close(fd);
 }
 
-static void stingray_power_init(struct power_module *module)
+static void power_init(struct power_module *module)
 {
     /*
      * cpufreq interactive governor: timer 20ms, min sample 30ms.
@@ -92,7 +93,7 @@ static void stingray_power_init(struct power_module *module)
 		//"1");
 }
 
-static void stingray_power_set_interactive(struct power_module *module, int on)
+static void power_set_interactive(struct power_module *module, int on)
 {
     int len;
     char buf[MAX_BUF_SZ];
@@ -127,17 +128,31 @@ static void stingray_power_set_interactive(struct power_module *module, int on)
 
 }
 
-static void stingray_power_hint(struct power_module *module, power_hint_t hint,
-                            void *data)
-{
-    char buf[80];
-    int len;
-
+static void power_hint(struct power_module *module, power_hint_t hint,
+                       void *data) {
     switch (hint) {
-    case POWER_HINT_VSYNC:
-        break;
+        case POWER_HINT_VSYNC:
+            //ALOGE("%s: vsync", __func__);
+            break;
+        case POWER_HINT_INTERACTION:
+            //ALOGE("%s: interaction", __func__);
+            break;
+        case POWER_HINT_LOW_POWER:
+            //ALOGE("%s: low power", __func__);
+            break;
+        default:
+            break;
+    }
+}
 
-    default:
+static void power_set_feature(struct power_module *module, feature_t feature, int state)
+{
+    switch (feature) {
+        case POWER_FEATURE_DOUBLE_TAP_TO_WAKE:
+            ALOGE("%s: %s double tap to wake", __func__, state ? "enabling" : "disabling");
+            //wake_gesture_enabled = state>0?1:0;
+            break;
+        default:
             break;
     }
 }
@@ -148,16 +163,17 @@ static struct hw_module_methods_t power_module_methods = {
 
 struct power_module HAL_MODULE_INFO_SYM = {
     .common = {
-        .tag = HARDWARE_MODULE_TAG,
-        .module_api_version = POWER_MODULE_API_VERSION_0_2,
-        .hal_api_version = HARDWARE_HAL_API_VERSION,
-        .id = POWER_HARDWARE_MODULE_ID,
-        .name = "Stingray Power HAL",
-        .author = "The Android Open Source Project",
-        .methods = &power_module_methods,
+        .tag               = HARDWARE_MODULE_TAG,
+        .module_api_version = POWER_MODULE_API_VERSION_0_3,
+        .hal_api_version    = HARDWARE_HAL_API_VERSION,
+        .id                = POWER_HARDWARE_MODULE_ID,
+        .name              = "Stingray Power HAL",
+        .author            = "The Android Open Source Project",
+        .methods            = &power_module_methods,
     },
 
-    .init = stingray_power_init,
-    .setInteractive = stingray_power_set_interactive,
-    .powerHint = stingray_power_hint,
+    .init = power_init,
+    .setInteractive = power_set_interactive,
+    .powerHint = power_hint,
+    .setFeature = power_set_feature,
 };
