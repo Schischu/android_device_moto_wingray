@@ -33,15 +33,15 @@ TARGET_ARCH_VARIANT_FPU := vfpv3-d16
 TARGET_BOARD_PLATFORM := tegra
 
 TARGET_USERIMAGES_USE_EXT4 := true
+
 # Kernel
 BOARD_PAGE_SIZE := 2048
 BOARD_KERNEL_BASE := 0x10000000
 BOARD_KERNEL_CMDLINE := androidboot.carrier=wifi-only product_type=w
+TARGET_KERNEL_SOURCE := kernel/moto/stingray-kernel
+TARGET_KERNEL_CONFIG := elementalxvanilla_defconfig
 
-
-# TARGET_KERNEL_SOURCE := kernel/moto/stingray
-# TARGET_KERNEL_CONFIG := elementalxvanilla_defconfig
-TARGET_PREBUILT_KERNEL := device/moto/wingray/kernel
+#TARGET_PREBUILT_KERNEL := device/moto/wingray/kernel
 
 # Healthd
 BOARD_AC_SYSFS_PATH := $(BOARD_POWER_SUPPLY_PATH)/ac
