@@ -27,6 +27,7 @@ TARGET_ARCH_VARIANT_CPU := cortex-a9
 TARGET_ARCH_VARIANT_FPU := vfpv3-d16
 TARGET_CPU_SMP := true
 TARGET_BOARD_PLATFORM := tegra
+TARGET_TEGRA_VERSION := t20
 ARCH_ARM_HAVE_TLS_REGISTER := true
 
 
@@ -38,7 +39,10 @@ BOARD_KERNEL_PAGESIZE := 2048
 TARGET_KERNEL_CONFIG := elementalxvanilla_defconfig
 TARGET_KERNEL_SOURCE := kernel/moto/stingray-kernel
 BOARD_KERNEL_CMDLINE := androidboot.carrier=wifi-only product_type=w
+#TARGET_PREBUILT_KERNEL := device/moto/wingray/kernel
 
+#KERNEL_TOOLCHAIN := arm-eabi-4.7
+#KERNEL_TOOLCHAIN_PREFIX :=
 
 # Healthd
 BOARD_AC_SYSFS_PATH := $(BOARD_POWER_SUPPLY_PATH)/ac
@@ -140,14 +144,17 @@ BOARD_HAS_NO_SELECT_BUTTON := true
 # Misc flags
 ARCH_ARM_HIGH_OPTIMIZATION := true
 ARCH_ARM_USE_NON_NEON_MEMCPY := true
-MALLOC_IMPL := dlmalloc
+# MALLOC_IMPL := dlmalloc # Removed 2/16
 COMMON_GLOBAL_CFLAGS += -DNEEDS_VECTORIMPL_SYMBOLS #flash compatibility
 TARGET_ENABLE_NON_PIE_SUPPORT := true
+
+#New since 2/16
+BOARD_TEGRA2_HWC_SET_RT_IOPRIO := true
 
 COMMON_GLOBAL_CFLAGS += -DREFBASE_JB_MR1_COMPAT_SYMBOLS #system/core/libutils/RefBase.cpp
 
 # Optimization hwui
-HWUI_COMPILE_FOR_PERF := true
+# HWUI_COMPILE_FOR_PERF := true # Removed 2/16
 
 # COMMON_GLOBAL_CFLAGS += -DICS_AUDIO_BLOB #system/core/include/system/audio.h
 

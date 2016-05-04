@@ -53,10 +53,12 @@ PRODUCT_PROPERTY_OVERRIDES := \
 PRODUCT_PROPERTY_OVERRIDES += \
     media.stagefright.cache-params=6144/-1/30 \
     ro.sf.lcd_density=160 \
-    dalvik.vm.dexopt-data-only=1 \
+    dalvik.vm.dex2oat-flags=--compiler-backend=Quick \
+    dalvik.vm.backgroundgctype=SS \
     debug.hwui.render_dirty_regions=false \
     ro.zygote.disable_gl_preload=true \
-    ro.opengles.surface.rgb565=true
+    ro.opengles.surface.rgb565=true \
+     persist.sys.media.legacy-drm=true
 
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
     persist.sys.usb.config=mtp
@@ -148,6 +150,10 @@ PRODUCT_PACKAGES += \
     power.stingray \
     libnetcmdiface
 
+# Preload compability symbols
+PRODUCT_PACKAGES += \
+    libp4utl
+
 # Filesystem management tools
 PRODUCT_PACKAGES += \
 	make_ext4fs \
@@ -158,3 +164,5 @@ $(call inherit-product, frameworks/native/build/tablet-dalvik-heap.mk)
 $(call inherit-product, vendor/broadcom/wingray/wingray-vendor.mk)
 $(call inherit-product, vendor/moto/wingray/wingray-vendor.mk)
 $(call inherit-product, vendor/nvidia/wingray/wingray-vendor.mk)
+
+$(call inherit-product, vendor/google/google-vendor.mk)
