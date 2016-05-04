@@ -37,7 +37,7 @@ TARGET_USERIMAGES_USE_EXT4 := true
 # Kernel
 BOARD_PAGE_SIZE := 2048
 BOARD_KERNEL_BASE := 0x10000000
-BOARD_KERNEL_CMDLINE := androidboot.carrier=wifi-only product_type=w
+BOARD_KERNEL_CMDLINE := androidboot.carrier=wifi-only product_type=w selinux=0
 TARGET_KERNEL_SOURCE := kernel/moto/stingray-kernel
 TARGET_KERNEL_CONFIG := elementalxvanilla_defconfig
 
@@ -154,21 +154,21 @@ COMMON_GLOBAL_CFLAGS += -DREFBASE_JB_MR1_COMPAT_SYMBOLS #system/core/libutils/Re
 
 BOARD_SUPPRESS_EMMC_WIPE := true
 TARGET_RECOVERY_PIXEL_FORMAT := "RGBX_8888"
-TARGET_RECOVERY_FSTAB = device/moto/wingray/fstab.stingray
+
+RECOVERY_FSTAB_VERSION := 2
+#TARGET_RECOVERY_FSTAB = device/moto/wingray/recovery/twrp.fstab
+TARGET_RECOVERY_FSTAB = device/moto/wingray/rootdir/fstab.stingray
 
 #TARGET_ENABLE_OFFLOAD_ENHANCEMENTS := true
 
-TARGET_RELEASETOOLS_EXTENSIONS := device/moto/wingray
+#TARGET_RELEASETOOLS_EXTENSIONS := device/moto/wingray
 #TWRP config
 DEVICE_RESOLUTION := 1280x800
 RECOVERY_SDCARD_ON_DATA := true
 WIPE_IS_SUPPORTED := false
 
-#A BOARD_CUSTOM_GRAPHICS := ../../../device/samsung/p4-common/recovery/graphics.c
-#A BOARD_CUSTOM_RECOVERY_KEYMAPPING := ../../device/samsung/p4-common/recovery/recovery_ui.c
-
 TW_ALWAYS_RMRF := true
-TW_DISABLE_TTF := true
+#TW_DISABLE_TTF := true #Has been deprecated
 #TW_USE_TOOLBOX := true #causes weirdness. do not use. kill supersu instead
 
 TW_HAS_DOWNLOAD_MODE := true

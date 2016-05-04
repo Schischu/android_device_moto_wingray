@@ -28,9 +28,8 @@ PRODUCT_COPY_FILES := \
     $(LOCAL_PATH)/rootdir/init.stingray.rc:root/init.stingray.rc \
     $(LOCAL_PATH)/rootdir/fstab.stingray:root/fstab.stingray \
     $(LOCAL_PATH)/rootdir/ueventd.stingray.rc:root/ueventd.stingray.rc \
-    $(LOCAL_PATH)/rootdir/twrp.fstab:recovery/root/etc/twrp.fstab \
-    $(LOCAL_PATH)/rootdir/init.stingray.usb.rc:root/init.stingray.usb.rc
-
+    $(LOCAL_PATH)/rootdir/init.stingray.usb.rc:root/init.stingray.usb.rc \
+    $(LOCAL_PATH)/rootdir/twrp.fstab:recovery/root/twrp.fstab
 
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/fw/mXT1386_08_AA.bin:system/etc/firmware/mXT1386_08_AA.bin \
@@ -77,8 +76,8 @@ PRODUCT_PACKAGES := \
 	dhcpcd.conf \
 	su
 
-PRODUCT_COPY_FILES += \
-	$(LOCAL_PATH)/rootdir/init.recovery.stingray.rc:root/init.recovery.stingray.rc
+RODUCT_COPY_FILES += \
+	$(LOCAL_PATH)/recovery/init.recovery.stingray.rc:recovery/root/init.recovery.stingray.rc
 
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
 	persist.sys.root_access=1
@@ -112,8 +111,8 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/keylayout/cpcap-key.kl:system/usr/keylayout/cpcap-key.kl \
     $(LOCAL_PATH)/keylayout/stingray-keypad.kl:system/usr/keylayout/stingray-keypad.kl
 
-PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/init/init:root/init
+#PRODUCT_COPY_FILES += \
+#    $(LOCAL_PATH)/init/init:root/init
 
 #PRODUCT_PACKAGES += \
 #    hwcomposer.tegra
@@ -184,6 +183,8 @@ PRODUCT_PACKAGES += \
 	make_ext4fs \
 	setup_fs
 
+PRODUCT_PROPERTY_OVERRIDES += \
+  ro.boot.selinux=disabled
 
 
 $(call inherit-product, frameworks/native/build/tablet-dalvik-heap.mk)
