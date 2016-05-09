@@ -20,10 +20,9 @@ PRODUCT_AAPT_PREF_CONFIG := mdpi
 
 PRODUCT_COPY_FILES := \
     $(LOCAL_PATH)/rootdir/init.stingray.rc:root/init.stingray.rc \
+    $(LOCAL_PATH)/rootdir/init.stingray.usb.rc:root/init.stingray.usb.rc \
     $(LOCAL_PATH)/rootdir/fstab.stingray:root/fstab.stingray \
-    $(LOCAL_PATH)/rootdir/ueventd.stingray.rc:root/ueventd.stingray.rc \
-    $(LOCAL_PATH)/rootdir/twrp.fstab:recovery/root/etc/twrp.fstab \
-    $(LOCAL_PATH)/rootdir/init.stingray.usb.rc:root/init.stingray.usb.rc
+    $(LOCAL_PATH)/rootdir/ueventd.stingray.rc:root/ueventd.stingray.rc
 
 
 PRODUCT_COPY_FILES += \
@@ -58,7 +57,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
     debug.hwui.render_dirty_regions=false \
     ro.zygote.disable_gl_preload=true \
     ro.opengles.surface.rgb565=true \
-     persist.sys.media.legacy-drm=true
+    persist.sys.media.legacy-drm=true
 
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
     persist.sys.usb.config=mtp
@@ -73,13 +72,8 @@ PRODUCT_PACKAGES := \
 	dhcpcd.conf \
 	su
 
-PRODUCT_COPY_FILES += \
-	$(LOCAL_PATH)/rootdir/init.recovery.stingray.rc:root/init.recovery.stingray.rc
-
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
 	persist.sys.root_access=1
-
-#PRODUCT_COPY_FILES += \
 
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/wifi/wpa_supplicant.conf:system/etc/wifi/wpa_supplicant.conf \
@@ -99,20 +93,20 @@ PRODUCT_PACKAGES += \
 
 # Audio
 PRODUCT_COPY_FILES += \
-        device/moto/wingray/audio/audio_policy.conf:system/etc/audio_policy.conf
+    device/moto/wingray/audio/audio_policy.conf:system/etc/audio_policy.conf
 
 PRODUCT_PACKAGES += \
-        audio.primary.stingray \
-        audio_policy.stingray \
-        audio.a2dp.default \
-        libaudioutils \
-        libtinyalsa
+    audio.primary.stingray \
+    audio_policy.stingray \
+    audio.a2dp.default \
+    libaudioutils \
+    libtinyalsa
 
 PRODUCT_PACKAGES += \
-        lights.stingray
+    lights.stingray
 
 PRODUCT_PACKAGES += \
-        sensors.stingray
+    sensors.stingray
 
 PRODUCT_PACKAGES += \
     whisperd
@@ -152,12 +146,15 @@ PRODUCT_PACKAGES += \
 
 # Preload compability symbols
 PRODUCT_PACKAGES += \
-    libp4utl
+    libstingrayutl
 
 # Filesystem management tools
 PRODUCT_PACKAGES += \
 	make_ext4fs \
 	setup_fs
+
+PRODUCT_PROPERTY_OVERRIDES += \
+  ro.boot.selinux=disabled
 
 $(call inherit-product, frameworks/native/build/tablet-dalvik-heap.mk)
 

@@ -38,7 +38,7 @@ BOARD_PAGE_SIZE := 2048
 BOARD_KERNEL_PAGESIZE := 2048
 TARGET_KERNEL_CONFIG := elementalxvanilla_defconfig
 TARGET_KERNEL_SOURCE := kernel/moto/stingray-kernel
-BOARD_KERNEL_CMDLINE := androidboot.carrier=wifi-only product_type=w
+BOARD_KERNEL_CMDLINE := androidboot.baseband=wifi-only product_type=w androidboot.selinux=disabled androidboot.hardware=stingray
 #TARGET_PREBUILT_KERNEL := device/moto/wingray/kernel
 
 #KERNEL_TOOLCHAIN := arm-eabi-4.7
