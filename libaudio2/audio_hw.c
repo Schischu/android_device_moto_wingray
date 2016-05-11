@@ -55,6 +55,9 @@ struct audio_device {
     struct cpcap_audio_stream cpcap_in_device;  //struct cpcap_audio_stream mCurInDevice;
 
     float vol_master;
+    
+    bool mute_master;
+    bool mute_mic; //mMicMute
 };
 
 struct stream_out {
@@ -77,6 +80,11 @@ struct stream_in {
     struct audio_stream_in stream;
 
     struct audio_device *dev;               //AudioHardware* mHardware;
+
+    int              fd_in;      //mFd
+    int              fd_in_ctl;  //mFdCtl
+    
+    int standby;
 };
 
 static uint32_t out_get_sample_rate(const struct audio_stream *stream)
@@ -306,19 +314,40 @@ static int out_get_next_write_timestamp(const struct audio_stream_out *stream,
 /** audio_stream_in implementation **/
 static uint32_t in_get_sample_rate(const struct audio_stream *stream)
 {
-    ALOGV("%s -><", __func__);
-    return 8000;
+    struct stream_in *in = (struct stream_in *)stream;
+    struct audio_device *adev = (struct audio_device *)in->dev;
+
+    if (adev->cpcap_in_rate == 0)
+    {
+        adev->cpcap_in_rate = 8000;
+    }
+
+    ALOGV("%s ->< %u", __func__, adev->cpcap_in_rate);
+    return adev->cpcap_in_rate;
 }
 
 static int in_set_sample_rate(struct audio_stream *stream, uint32_t rate)
 {
-    ALOGV("%s -><", __func__);
+    struct stream_in *in = (struct stream_in *)stream;
+    struct audio_device *adev = (struct audio_device *)in->dev;
+
+    ALOGV("%s -> %u", __func__, rate);
+
+    adev->cpcap_in_rate = rate;
+    if (ioctl(adev->fd_cpcap_ctl, CPCAP_AUDIO_OUT_SET_RATE, adev->cpcap_in_rate) < 0) {
+        ALOGE("could not set input rate: %s", strerror(errno));
+    }
+
+    ALOGV("%s <-", __func__);
     return 0;
 }
 
 static size_t in_get_buffer_size(const struct audio_stream *stream)
 {
-    ALOGV("%s -><", __func__);
+    struct stream_in *in = (struct stream_in *)stream;
+    struct audio_device *adev = (struct audio_device *)in->dev;
+    
+    ALOGV("%s ->< %u", __func__, 320);
     return 320;
 }
 
@@ -329,19 +358,47 @@ static audio_channel_mask_t in_get_channels(const struct audio_stream *stream)
 
 static audio_format_t in_get_format(const struct audio_stream *stream)
 {
-    ALOGV("%s -><", __func__);
+    ALOGV("%s ->< %X", __func__, AUDIO_FORMAT_PCM_16_BIT);
     return AUDIO_FORMAT_PCM_16_BIT;
 }
 
 static int in_set_format(struct audio_stream *stream, audio_format_t format)
 {
-    ALOGV("%s -><", __func__);
+    ALOGV("%s ->< %X", __func__, format);
     return 0;
 }
 
 static int in_standby(struct audio_stream *stream)
 {
-    ALOGV("%s -><", __func__);
+    struct stream_in *in = (struct stream_in *)stream;
+    struct cpcap_audio_stream standby;
+    
+    ALOGV("%s ->", __func__);
+    
+    standby.id = CPCAP_AUDIO_IN_STANDBY;
+    standby.on = 1;
+    
+    ALOGV("stop recording");
+    if (ioctl(in->fd_in_ctl, TEGRA_AUDIO_IN_STOP) < 0)
+       ALOGE("could not stop recording: %s", strerror(errno));
+
+    if (ioctl(in->dev->fd_cpcap_ctl, CPCAP_AUDIO_IN_SET_INPUT, &standby) < 0)
+    {
+        ALOGE("%s: could not turn off current input device (%d, on %d): %s",
+              __func__, standby.id, standby.on,
+              strerror(errno));
+    }
+
+    if (ioctl(in->dev->fd_cpcap_ctl, CPCAP_AUDIO_IN_GET_INPUT, &in->dev->cpcap_in_device) < 0) {
+        ALOGE("%s: could not get current input device after standby: %s", __func__, strerror(errno));
+    }
+
+    ALOGV("%s: after standby %s, input device %d is %s", __func__,
+         "enable" , in->dev->cpcap_in_device.id,
+         in->dev->cpcap_in_device.on ? "on" : "off");
+    
+    in->standby = 1;
+    
     return 0;
 }
 
@@ -373,12 +430,43 @@ static int in_set_gain(struct audio_stream_in *stream, float gain)
 static ssize_t in_read(struct audio_stream_in *stream, void* buffer,
                        size_t bytes)
 {
-    ALOGV("%s ->", __func__);
+    struct stream_in *in = (struct stream_in *)stream;
+    struct cpcap_audio_stream standby;
+
+    //ALOGV("%s ->", __func__);
+
+    if (in->standby == 1)
+    {
+        standby.id = CPCAP_AUDIO_IN_STANDBY;
+        standby.on = 0;
+
+        if (ioctl(in->dev->fd_cpcap_ctl, CPCAP_AUDIO_IN_SET_INPUT, &standby) < 0)
+        {
+            ALOGE("could not set output (%d, on %d): %s",
+                  standby.id, standby.on,
+                  strerror(errno));
+        }
+
+        if (ioctl(in->dev->fd_cpcap_ctl, CPCAP_AUDIO_IN_GET_INPUT, &in->dev->cpcap_in_device) < 0) {
+            ALOGE("%s: could not get current output device after standby: %s", __func__, strerror(errno));
+        }
+
+        ALOGV("%s: after standby %s, input device %d is %s", __func__,
+             "enable" , in->dev->cpcap_in_device.id,
+             in->dev->cpcap_in_device.on ? "on" : "off");
+        
+        in->standby = 0;
+    }
+
+    bytes = read(in->fd_in, buffer, bytes);
+
+#if 0
     /* XXX: fake timing for audio input */
     usleep(bytes * 1000000 / audio_stream_in_frame_size(stream) /
            in_get_sample_rate(&stream->common));
-           
-    ALOGV("%s -< bytes: %u", __func__, bytes);
+#endif
+
+    //ALOGV("%s -< bytes: %u", __func__, bytes);
     return bytes;
 }
 
@@ -461,6 +549,14 @@ static int adev_open_output_stream(struct audio_hw_device *dev,
     out->dev = adev;
 
     *stream_out = &out->stream;
+
+    ALOGV("%s sample_rate:  %u", __func__, config->sample_rate);
+    ALOGV("%s channel_mask: %X", __func__, config->channel_mask);
+    ALOGV("%s format:       %X", __func__, config->format);
+    ALOGV("%s frame_count:  %u", __func__, config->frame_count);
+
+
+
     ALOGV("%s -<", __func__);
     return 0;
 
@@ -472,17 +568,122 @@ err_open:
 }
 
 static void adev_close_output_stream(struct audio_hw_device *dev,
-                                     struct audio_stream_out *stream)
+                                     struct audio_stream_out *stream_out)
 {
+    struct stream_out *out = (struct stream_out *)stream_out;
+
     ALOGV("%s ->", __func__);
-    free(stream);
+
+    if (out->fd_out >= 0)
+    {
+        close(out->fd_out);
+    }
+
+    if (out->fd_out_ctl >= 0)
+    {
+        close(out->fd_out_ctl);
+    }
+
+    if (out->fd_out_bt >= 0)
+    {
+        close(out->fd_out_bt);
+    }
+
+    if (out->fd_out_bt_ctl >= 0)
+    {
+        close(out->fd_out_bt_ctl);
+    }
+
+    if (out->fd_out_bt_io_ctl >= 0)
+    {
+        close(out->fd_out_bt_io_ctl);
+    }
+
+    if (out->fd_out_spdif >= 0)
+    {
+        close(out->fd_out_spdif);
+    }
+
+    if (out->fd_out_spdif_ctl >= 0)
+    {
+        close(out->fd_out_spdif_ctl);
+    }
+
+    free(stream_out);
+
     ALOGV("%s -<", __func__);
 }
 
 static int adev_set_parameters(struct audio_hw_device *dev, const char *kvpairs)
 {
-    ALOGV("%s -><", __func__);
-    return -ENOSYS;
+    struct audio_device *adev = (struct audio_device *)dev;
+
+    struct str_parms *parms;
+    char keyval[16];
+    int device;
+    int retval = 0;
+
+    int sndOutDevice = -1;
+    int sndInDevice = -1;
+
+    ALOGV("%s ->", __func__);
+
+    parms = str_parms_create_str(kvpairs);
+
+    /* dump params */
+    str_parms_dump(parms);
+
+    retval = str_parms_get_int(parms, AUDIO_PARAMETER_DEVICE_CONNECT, &device);
+    if (retval >= 0)
+    {
+        if ((device & AUDIO_DEVICE_OUT_WIRED_HEADSET) == AUDIO_DEVICE_OUT_WIRED_HEADSET)
+        {
+            ALOGV("%s AUDIO_DEVICE_OUT_WIRED_HEADSET", __func__);
+            sndOutDevice = CPCAP_AUDIO_OUT_HEADSET;
+        }
+
+        if ((device & AUDIO_DEVICE_IN_WIRED_HEADSET) == AUDIO_DEVICE_IN_WIRED_HEADSET)
+        {
+            ALOGV("%s AUDIO_DEVICE_IN_WIRED_HEADSET", __func__);
+            sndInDevice = CPCAP_AUDIO_IN_MIC2;
+        }
+    }
+
+    retval = str_parms_get_int(parms, AUDIO_PARAMETER_DEVICE_DISCONNECT, &device);
+    if (retval >= 0)
+    {
+        if ((device & AUDIO_DEVICE_OUT_WIRED_HEADSET) == AUDIO_DEVICE_OUT_WIRED_HEADSET)
+        {
+            ALOGV("%s AUDIO_DEVICE_OUT_WIRED_HEADSET", __func__);
+            sndOutDevice = CPCAP_AUDIO_OUT_SPEAKER;
+        }
+
+        if ((device & AUDIO_DEVICE_IN_WIRED_HEADSET) == AUDIO_DEVICE_IN_WIRED_HEADSET)
+        {
+            ALOGV("%s AUDIO_DEVICE_IN_WIRED_HEADSET", __func__);
+            sndInDevice = CPCAP_AUDIO_IN_MIC1;
+        }
+    }
+
+    if (sndOutDevice >= 0)
+    {
+        adev->cpcap_out_device.id = sndOutDevice;
+        adev->cpcap_out_device.on = true;
+        ioctl(adev->fd_cpcap_ctl, CPCAP_AUDIO_OUT_SET_OUTPUT, &adev->cpcap_out_device);
+    
+    }
+
+    if (sndInDevice >= 0)
+    {
+        adev->cpcap_in_device.id = sndInDevice;
+        adev->cpcap_in_device.on = true;
+        ioctl(adev->fd_cpcap_ctl, CPCAP_AUDIO_IN_SET_INPUT, &adev->cpcap_in_device);
+    }
+
+
+    ALOGV("%s <-", __func__);
+
+    return 0;
 }
 
 static char * adev_get_parameters(const struct audio_hw_device *dev,
@@ -546,14 +747,26 @@ static int adev_get_master_volume(struct audio_hw_device *dev, float *volume)
 
 static int adev_set_master_mute(struct audio_hw_device *dev, bool muted)
 {
-    ALOGV("%s -><", __func__);
-    return -ENOSYS;
+    struct audio_device *adev = (struct audio_device *)dev;
+
+    ALOGV("%s ->", __func__);
+
+    adev->mute_master = muted;
+
+    ALOGV("%s -< ret: %d", __func__, 0);
+    return 0;
 }
 
 static int adev_get_master_mute(struct audio_hw_device *dev, bool *muted)
 {
-    ALOGV("%s -><", __func__);
-    return -ENOSYS;
+    struct audio_device *adev = (struct audio_device *)dev;
+
+    ALOGV("%s ->", __func__);
+
+    *muted = adev->mute_master;
+
+    ALOGV("%s -< ret: %d *muted: %u", __func__, 0, *muted);
+    return 0;
 }
 #endif
 
@@ -564,21 +777,68 @@ static int adev_set_mode(struct audio_hw_device *dev, audio_mode_t mode)
 
 static int adev_set_mic_mute(struct audio_hw_device *dev, bool state)
 {
-    ALOGV("%s -><", __func__);
-    return -ENOSYS;
+    struct audio_device *adev = (struct audio_device *)dev;
+
+    ALOGV("%s ->", __func__);
+
+    adev->mute_mic = state;
+
+    ALOGV("%s -< ret: %d", __func__, 0);
+    return 0;
 }
 
 static int adev_get_mic_mute(const struct audio_hw_device *dev, bool *state)
 {
-    ALOGV("%s -><", __func__);
-    return -ENOSYS;
+    struct audio_device *adev = (struct audio_device *)dev;
+
+    ALOGV("%s ->", __func__);
+
+    *state = adev->mute_mic;
+
+    ALOGV("%s -< ret: %d *state: %u", __func__, 0, *state);
+    return 0;
 }
 
 static size_t adev_get_input_buffer_size(const struct audio_hw_device *dev,
                                          const struct audio_config *config)
 {
-    ALOGV("%s -><", __func__);
-    return 320;
+    struct audio_device *adev = (struct audio_device *)dev;
+    size_t bufsize;
+    unsigned char channel_count;
+
+    ALOGV("%s ->", __func__);
+
+    if (config->format != AUDIO_FORMAT_PCM_16_BIT)
+    {
+        ALOGW("%s: bad format: %d", __func__, config->format);
+        return 0;
+    }
+
+    if ((config->channel_mask != AUDIO_CHANNEL_IN_MONO) && 
+        (config->channel_mask != AUDIO_CHANNEL_IN_STEREO))
+    {
+        ALOGW("%s: bad channel count: %X", __func__, config->channel_mask);
+        return 0;
+    }
+
+    channel_count = 1;
+
+    if (config->channel_mask != AUDIO_CHANNEL_IN_STEREO)
+    {
+        channel_count = 2;
+    }
+
+    // Return 20 msec input buffer size.
+    bufsize = config->sample_rate * sizeof(int16_t) * channel_count / 50;
+    if (bufsize & 0x7) {
+       // Not divisible by 8.
+       bufsize +=8;
+       bufsize &= ~0x7;
+    }
+    ALOGV("%s: returns %d for rate %d", __func__, bufsize, config->sample_rate);
+
+    ALOGV("%s <- %u", __func__, bufsize);
+    return bufsize;
 }
 
 static int adev_open_input_stream(struct audio_hw_device *dev,
@@ -616,21 +876,76 @@ static int adev_open_input_stream(struct audio_hw_device *dev,
     in->stream.read = in_read;
     in->stream.get_input_frames_lost = in_get_input_frames_lost;
 
+    in->fd_in           = open("/dev/audio1_in", O_RDWR);
+    in->fd_in_ctl       = open("/dev/audio1_in_ctl", O_RDWR);
+
+    if (in->fd_in < 0 || in->fd_in_ctl < 0)
+    {
+        ret = -1;
+        ALOGW("%s: fd_in: %d fd_in_ctl: %d", __func__, in->fd_in, in->fd_in_ctl);
+        goto err_open;
+    }
+
+    in->standby = 0;
+
+    in->dev = adev;
+
     *stream_in = &in->stream;
+
+    ALOGV("%s sample_rate:  %u", __func__, config->sample_rate);
+    ALOGV("%s channel_mask: %X", __func__, config->channel_mask);
+    ALOGV("%s format:       %X", __func__, config->format);
+    ALOGV("%s frame_count:  %u", __func__, config->frame_count);
+
+#if 0
+    struct tegra_audio_in_config tegra_config;
+    ret = ioctl(in->fd_in_ctl, TEGRA_AUDIO_IN_GET_CONFIG, &tegra_config);
+    if (ret < 0)
+    {
+        ALOGE("cannot read input config: %s", strerror(errno));
+    }
+    tegra_config.stereo = (config->channel_mask == AUDIO_CHANNEL_IN_FRONT) ? true : false;
+    tegra_config.rate   = config->sample_rate;
+    ret = ioctl(in->fd_in_ctl, TEGRA_AUDIO_IN_SET_CONFIG, &tegra_config);
+    if (ret < 0)
+    {
+        ALOGE("cannot write input config: %s", strerror(errno));
+    }
+#endif
+
+    //in_set_sample_rate(in, config->sample_rate);
+
     ALOGV("%s -<", __func__);
     return 0;
 
 err_open:
     free(in);
     *stream_in = NULL;
-    ALOGV("%s -> err: %u", __func__, ret);
+    ALOGE("%s <- err: %d", __func__, ret);
     return ret;
 }
 
 static void adev_close_input_stream(struct audio_hw_device *dev,
-                                   struct audio_stream_in *in)
+                                   struct audio_stream_in *stream_in)
 {
-    ALOGV("%s -><", __func__);
+    struct stream_in *in = (struct stream_in *)stream_in;
+
+    ALOGV("%s ->", __func__);
+
+    if (in->fd_in >= 0)
+    {
+        close(in->fd_in);
+    }
+
+    if (in->fd_in_ctl >= 0)
+    {
+        close(in->fd_in_ctl);
+    }
+
+    free(stream_in);
+
+    ALOGV("%s <-", __func__);
+
     return;
 }
 
@@ -721,7 +1036,8 @@ static int adev_open(const hw_module_t* module, const char* name,
             ALOGE("could not set output rate: %s", strerror(errno));
         }
     }
-    
+
+    //Analog to in_get_sample_rate
     if (ioctl(adev->fd_cpcap_ctl, CPCAP_AUDIO_IN_GET_RATE, &adev->cpcap_in_rate) < 0) {
         ALOGE("could not get input rate: %s", strerror(errno));
     }
@@ -732,7 +1048,9 @@ static int adev_open(const hw_module_t* module, const char* name,
     }
     
     adev->vol_master = (volume_output * 1.0f) / CPCAP_AUDIO_OUT_VOL_MAX;
-    
+    adev->mute_master = false;
+    adev->mute_mic = false;
+
     adev->init = 1;
 
     *device = &adev->device.common;
